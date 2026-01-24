@@ -413,7 +413,7 @@ class _EventsState extends State<Events> {
                   'description': descCtrl.text,
                   'startedAt': startDate!.toIso8601String(),
                   'endedAt': endDate!.toIso8601String(),
-                  // 'prizes': prizes
+                  // 'prizes': prizes 
                   //     .map((p) => {'condition': p.condition, 'prize': p.prize})
                   //     .toList(),
                   // 'participants': participants
