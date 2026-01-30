@@ -129,3 +129,17 @@ const UPDATESESSION = 'session/update/';
 const GETALLEVENTS = 'event/show/all';
 
 const CREATEEVENT = 'event/create';
+
+const UPDATEEVENT = 'event/update/';
+
+const CREATEPRIZE = 'prize/create';
+
+const DELETEPRIZE = 'prize/delete/';
+
+const DELETEPARTICIPANT = 'event/unsubscribe/';
+
+const EDITUSERSCORE = 'event/scores';
+
+const CREATEARTICLE = 'article/create';
+
+const EDITARTICLE = 'article/update/';

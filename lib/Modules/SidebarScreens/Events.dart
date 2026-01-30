@@ -29,6 +29,12 @@ class _EventsState extends State<Events> {
     _searchController.addListener(() => setState(() {}));
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   List<EventModel> _filterEvents(List<EventModel> events) {
     final query = _searchController.text.toLowerCase();
     return events.where((s) {
@@ -63,6 +69,7 @@ class _EventsState extends State<Events> {
                     child: Components.reusableTextFormField(
                       hint: 'Search by title',
                       prefixIcon: Icons.search,
+                      validator: (_) => null,
                       controller: _searchController,
                     ),
                   ),
@@ -141,16 +148,33 @@ class _EventsState extends State<Events> {
                               cells: [
                                 DataCell(Center(child: Text(e.title))),
                                 DataCell(
-                                  Center(child: Text(e.startedAt.toString())),
+                                  Center(
+                                    child: Text(
+                                      e.startedAt
+                                          .toIso8601String()
+                                          .split('T')
+                                          .first,
+                                    ),
+                                  ),
                                 ),
                                 DataCell(
-                                  Center(child: Text(e.endedAt.toString())),
+                                  Center(
+                                    child: Text(
+                                      e.endedAt
+                                          .toIso8601String()
+                                          .split('T')
+                                          .first,
+                                    ),
+                                  ),
                                 ),
                                 DataCell(
                                   Center(
                                     child: ElevatedButton(
-                                      onPressed: () =>
-                                          _showPrizesDialog(context, e.prizes),
+                                      onPressed: () => _showPrizesDialog(
+                                        context,
+                                        manager,
+                                        e,
+                                      ),
                                       child: const Text('View'),
                                     ),
                                   ),
@@ -160,6 +184,8 @@ class _EventsState extends State<Events> {
                                     child: ElevatedButton(
                                       onPressed: () => _showParticipantsDialog(
                                         context,
+                                        manager,
+                                        e,
                                         e.participants,
                                       ),
                                       child: const Text('View'),
@@ -225,8 +251,6 @@ class _EventsState extends State<Events> {
     final descCtrl = TextEditingController(text: event?.description ?? '');
     DateTime? startDate = event?.startedAt;
     DateTime? endDate = event?.endedAt;
-    final List<EventPrizeModel> prizes = event?.prizes ?? [];
-    final List<EventParticipantModel> participants = event?.participants ?? [];
 
     showDialog(
       context: context,
@@ -275,8 +299,9 @@ class _EventsState extends State<Events> {
                               firstDate: DateTime(2025),
                               lastDate: DateTime(2100),
                             );
-                            if (picked != null)
+                            if (picked != null) {
                               setState(() => startDate = picked);
+                            }
                           },
                         ),
                       ),
@@ -304,94 +329,6 @@ class _EventsState extends State<Events> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  // Prizes
-                  Row(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () async {
-                          final conditionCtrl = TextEditingController();
-                          final prizeCtrl = TextEditingController();
-                          await showDialog(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                              backgroundColor: Colors.grey[900],
-                              title: Components.reusableText(
-                                content: 'Add Prize',
-                                fontColor: Colors.teal,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Components.reusableTextFormField(
-                                    hint: 'Condition',
-                                    prefixIcon: Icons.rule,
-                                    controller: conditionCtrl,
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Components.reusableTextFormField(
-                                    hint: 'Prize',
-                                    prefixIcon: Icons.card_giftcard,
-                                    controller: prizeCtrl,
-                                  ),
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('Cancel'),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    if (conditionCtrl.text.isNotEmpty &&
-                                        prizeCtrl.text.isNotEmpty) {
-                                      setState(
-                                        () => prizes.add(
-                                          EventPrizeModel(
-                                            condition: conditionCtrl.text,
-                                            prize: prizeCtrl.text,
-                                          ),
-                                        ),
-                                      );
-                                      Navigator.pop(context);
-                                    }
-                                  },
-                                  child: const Text('Add'),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                        child: const Text('Add Prize'),
-                      ),
-                      const SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: () => _showPrizesDialog(context, prizes),
-                        child: const Text('View Prizes'),
-                      ),
-                      const SizedBox(width: 8),
-                      Components.reusableText(
-                        content: 'Total: ${prizes.length}',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  // Participants
-                  Row(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () =>
-                            _showParticipantsDialog(context, participants),
-                        child: const Text('View Participants'),
-                      ),
-                      const SizedBox(width: 8),
-                      Components.reusableText(
-                        content: 'Total: ${participants.length}',
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),
@@ -411,19 +348,13 @@ class _EventsState extends State<Events> {
                 final eventData = FormData.fromMap({
                   'title': titleCtrl.text,
                   'description': descCtrl.text,
-                  'startedAt': startDate!.toIso8601String(),
-                  'endedAt': endDate!.toIso8601String(),
-                  // 'prizes': prizes 
-                  //     .map((p) => {'condition': p.condition, 'prize': p.prize})
-                  //     .toList(),
-                  // 'participants': participants
-                  //     .map((p) => {'name': p.name, 'score': p.score})
-                  //     .toList(),
+                  'startedAt': startDate!.toIso8601String().split('T').first,
+                  'endedAt': endDate!.toIso8601String().split('T').first,
                 });
                 if (isEdit) {
-                  // manager.updateEvent(eventData, event!.id);
+                  manager.updateEvent(eventData, event.id, _pageIndex);
                 } else {
-                    manager.createEvent(eventData);
+                  manager.createEvent(eventData);
                 }
                 Navigator.pop(context);
               },
@@ -436,30 +367,87 @@ class _EventsState extends State<Events> {
   }
 
   // View Prizes Dialog
-  void _showPrizesDialog(BuildContext context, List<EventPrizeModel> prizes) {
+  void _showPrizesDialog(
+    BuildContext context,
+    Manager manager,
+    EventModel event,
+  ) {
+    final conditionCtrl = TextEditingController();
+    final prizeCtrl = TextEditingController();
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: Components.reusableText(
-          content: 'Prizes',
-          fontColor: Colors.teal,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: prizes.isEmpty
-              ? [Components.reusableText(content: 'No prizes')]
-              : prizes
-                    .map(
-                      (p) => ListTile(
-                        title: Components.reusableText(
-                          content: '${p.condition}: ${p.prize}',
-                        ),
+      builder: (_) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: Components.reusableText(
+            content: 'Prizes',
+            fontColor: Colors.teal,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+          content: SizedBox(
+            width: 350,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (event.prizes.isEmpty)
+                  Components.reusableText(content: 'No prizes')
+                else
+                  ...event.prizes.asMap().entries.map((entry) {
+                    final p = entry.value;
+                    return ListTile(
+                      title: Components.reusableText(
+                        content: '${p.condition}: ${p.prize}',
                       ),
-                    )
-                    .toList(),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          Components.deleteDialog<Manager>(context, () async {
+                            manager.deletePrize(p.id);
+                          }).then((_) {
+                            Navigator.pop(context);
+                          });
+                        },
+                      ),
+                    );
+                  }),
+                const Divider(color: Colors.grey),
+                // Add prize
+                Components.reusableTextFormField(
+                  hint: 'Condition',
+                  prefixIcon: Icons.rule,
+                  controller: conditionCtrl,
+                ),
+                const SizedBox(height: 8),
+                Components.reusableTextFormField(
+                  hint: 'Prize',
+                  prefixIcon: Icons.card_giftcard,
+                  controller: prizeCtrl,
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    if (conditionCtrl.text.isNotEmpty &&
+                        prizeCtrl.text.isNotEmpty) {
+                      manager.createPrize({
+                        'event_id': event.id,
+                        'description': prizeCtrl.text,
+                        'precondition': conditionCtrl.text,
+                      });
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: const Text('Add Prize'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
         ),
       ),
     );
@@ -468,6 +456,8 @@ class _EventsState extends State<Events> {
   // View Participants Dialog
   void _showParticipantsDialog(
     BuildContext context,
+    Manager manager,
+    EventModel event,
     List<EventParticipantModel> participants,
   ) {
     showDialog(
@@ -482,28 +472,76 @@ class _EventsState extends State<Events> {
             fontWeight: FontWeight.bold,
           ),
           content: SizedBox(
-            width: 300,
+            width: 340,
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: participants.isEmpty
-                  ? [Components.reusableText(content: 'No participants')]
-                  : participants
-                        .map(
-                          (p) => ListTile(
-                            title: Components.reusableText(
-                              content: '${p.name} - ${p.score}',
+              children: [
+                if (participants.isEmpty)
+                  Components.reusableText(content: 'No participants')
+                else
+                  ...participants.map((p) {
+                    final scoreCtrl = TextEditingController(
+                      text: p.score.toString(),
+                    );
+
+                    return Card(
+                      color: Colors.grey[850],
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Components.reusableText(
+                              content: '${p.firstName} ${p.lastName}',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
                             ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {
-                                // TODO : remove users from Event
-                              },
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Components.reusableTextFormField(
+                                    hint: 'Score',
+                                    controller: scoreCtrl,
+                                    prefixIcon: Icons.score,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.save,
+                                    color: Colors.teal,
+                                  ),
+                                  onPressed: () {
+                                    final newScore = int.tryParse(
+                                      scoreCtrl.text,
+                                    );
+                                    if (newScore == null) return;
+                                    // Api call
+                                    manager.editUserScore({
+                                      'userId': p.id,
+                                      'eventId': event.id,
+                                      'score': newScore,
+                                    });
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
                             ),
-                          ),
-                        )
-                        .toList(),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+              ],
             ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
         ),
       ),
     );

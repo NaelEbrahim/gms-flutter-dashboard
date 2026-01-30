@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gms_flutter_windows/Bloc/States.dart';
+import 'package:gms_flutter_windows/Models/ArticleModel.dart';
 import 'package:gms_flutter_windows/Models/ClassModel.dart';
 import 'package:gms_flutter_windows/Models/EventModel.dart';
 import 'package:gms_flutter_windows/Models/LoginModel.dart';
@@ -576,40 +577,185 @@ class Manager extends Cubit<BlocStates> {
     isLoading = true;
     emit(LoadingState());
     Dio_Linker.getData(
-      url: GETALLEVENTS,
-      params: {'page': page, 'size': paginationSize},
-    )
+          url: GETALLEVENTS,
+          params: {'page': page, 'size': paginationSize},
+        )
         .then((value) {
-      isLoading = false;
-      events = GetEventsModel.fromJson(value.data['message']);
-      emit(SuccessState());
-    })
+          isLoading = false;
+          events = GetEventsModel.fromJson(value.data['message']);
+          emit(SuccessState());
+        })
         .catchError((error) {
           String errorMessage = handleDioError(error);
-      emit(ErrorState(errorMessage));
-      isLoading = false;
-    });
+          emit(ErrorState(errorMessage));
+          isLoading = false;
+        });
   }
 
   void createEvent(FormData data) async {
     emit(LoadingState());
     Dio_Linker.postData(url: CREATEEVENT, data: data)
         .then((value) {
-      getEvents(0);
-      final navigator = MyApp.navigatorKey.currentState;
-      if (navigator != null) {
-        Components.showSnackBar(
-          navigator.context,
-          'event created',
-          color: Colors.green,
-        );
-      }
-    })
+          getEvents(0);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'event created',
+              color: Colors.green,
+            );
+          }
+        })
         .catchError((error) {
-      String errorMessage = handleDioError(error);
-      emit(ErrorState(errorMessage));
-    });
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
   }
 
+  void updateEvent(FormData data, int eventId, int page) {
+    emit(LoadingState());
+    Dio_Linker.putData(url: UPDATEEVENT + eventId.toString(), data: data)
+        .then((value) {
+          getEvents(page);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'event Updated',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
 
+  void createPrize(Map<String, dynamic> data) async {
+    emit(LoadingState());
+    Dio_Linker.postData(url: CREATEPRIZE, data: data)
+        .then((value) {
+          getEvents(0);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'prize created',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void deletePrize(int id) async {
+    emit(LoadingState());
+    Dio_Linker.deleteData(url: DELETEPRIZE + id.toString())
+        .then((value) {
+          getEvents(0);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'prize deleted',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void editUserScore(Map<String, dynamic> data) async {
+    emit(LoadingState());
+    Dio_Linker.putData(url: EDITUSERSCORE, data: data)
+        .then((value) {
+          getEvents(0);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'score updated',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  GetArticlesModel articles = GetArticlesModel(
+    count: 0,
+    totalPages: 1,
+    currentPage: 0,
+    items: [],
+  );
+
+  void getArticles(int page, String wikiType) async {
+    if (isLoading) return;
+    isLoading = true;
+    emit(LoadingState());
+    Dio_Linker.getData(
+          url: GETARTICLES,
+          params: {'page': page, 'size': paginationSize, 'wiki': wikiType},
+        )
+        .then((value) {
+          isLoading = false;
+          articles = GetArticlesModel.fromJson(value.data['message']);
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+          isLoading = false;
+        });
+  }
+
+  void createArticle(Map<String,dynamic> data) async {
+    emit(LoadingState());
+    Dio_Linker.postData(url: CREATEARTICLE, data: data)
+        .then((value) {
+          getArticles(0, 'All');
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'article created',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void updateArticle(Map<String,dynamic> data, int articleId, int page, String type) {
+    emit(LoadingState());
+    Dio_Linker.putData(url: EDITARTICLE + articleId.toString(), data: data)
+        .then((value) {
+          getArticles(page, type);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'article Updated',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
 }

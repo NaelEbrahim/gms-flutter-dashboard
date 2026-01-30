@@ -328,7 +328,7 @@ class _SessionsState extends State<Sessions> {
                     dropdownColor: Colors.grey[900],
                     decoration: const InputDecoration(
                       prefixIcon: Icon(Icons.fitness_center),
-                      labelText: 'Class',
+                      label: Text('Class',style: TextStyle(color: Colors.white),),
                       fillColor: Colors.black54,
                       filled: true,
                       border: OutlineInputBorder(),
@@ -354,7 +354,7 @@ class _SessionsState extends State<Sessions> {
                     dropdownColor: Colors.grey[900],
                     decoration: const InputDecoration(
                       prefixIcon: Icon(Icons.person),
-                      labelText: 'Coach',
+                      label: Text('Coach',style: TextStyle(color: Colors.white),),
                       fillColor: Colors.black54,
                       filled: true,
                       border: OutlineInputBorder(),

@@ -21,7 +21,7 @@ class Sidebar extends StatelessWidget {
       {'icon': Icons.newspaper, 'label': 'Programs'},
       {'icon': Icons.calendar_today, 'label': 'Sessions'},
       {'icon': Icons.event, 'label': 'Events'},
-      {'icon': Icons.settings, 'label': 'Settings'},
+      {'icon': Icons.article, 'label': 'Articles'},
     ];
 
     return Container(

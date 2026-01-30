@@ -32,13 +32,15 @@ class EventModel {
       imagePath: json['imagePath'],
       startedAt: DateTime.parse(json['startedAt']),
       endedAt: DateTime.parse(json['endedAt']),
-      prizes: (json['prizes'] as List<dynamic>?)
-          ?.map((e) => EventPrizeModel.fromJson(e))
-          .toList() ??
+      prizes:
+          (json['prizes'] as List<dynamic>?)
+              ?.map((e) => EventPrizeModel.fromJson(e))
+              .toList() ??
           [],
-      participants: (json['participants'] as List<dynamic>?)
-          ?.map((e) => EventParticipantModel.fromJson(e))
-          .toList() ??
+      participants:
+          (json['participants'] as List<dynamic>?)
+              ?.map((e) => EventParticipantModel.fromJson(e))
+              .toList() ??
           [],
     );
   }
@@ -49,28 +51,46 @@ class EventModel {
 }
 
 class EventPrizeModel {
+  final int id;
   final String condition;
   final String prize;
 
-  EventPrizeModel({required this.condition, required this.prize});
+  EventPrizeModel({
+    required this.condition,
+    required this.prize,
+    required this.id,
+  });
 
   factory EventPrizeModel.fromJson(Map<String, dynamic> json) {
     return EventPrizeModel(
-      condition: json['condition'],
-      prize: json['prize'],
+      id: json['id'],
+      condition: json['precondition'],
+      prize: json['description'],
     );
   }
 }
 
 class EventParticipantModel {
-  final String name;
+  final int id;
+  final String firstName;
+  final String lastName;
+  final String email;
   final double score;
 
-  EventParticipantModel({required this.name, required this.score});
+  EventParticipantModel({
+    required this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.email,
+    required this.score,
+  });
 
   factory EventParticipantModel.fromJson(Map<String, dynamic> json) {
     return EventParticipantModel(
-      name: json['name'],
+      id: json['id'],
+      firstName: json['firstName'],
+      lastName: json['lastName'],
+      email: json['email'],
       score: (json['score'] as num).toDouble(),
     );
   }

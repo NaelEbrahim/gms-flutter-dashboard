@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gms_flutter_windows/Bloc/Manager.dart';
 import 'package:gms_flutter_windows/Bloc/States.dart';
+import 'package:gms_flutter_windows/Modules/SidebarScreens/Articles.dart';
 import 'package:gms_flutter_windows/Modules/SidebarScreens/Classes.dart';
 import 'package:gms_flutter_windows/Modules/SidebarScreens/Events.dart';
 import 'package:gms_flutter_windows/Modules/SidebarScreens/Programs.dart';
@@ -27,6 +28,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     const Programs(),
     Sessions(),
     Events(),
+    Articles()
   ];
 
   @override
