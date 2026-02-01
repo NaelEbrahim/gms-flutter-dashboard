@@ -410,7 +410,12 @@ class _WorkoutsState extends State<Workouts> {
                   'avgCalories': double.parse(avgCaloriesCtrl.text),
                 });
                 if (isEdit) {
-                  manager.updateWorkout(data, workout.id,_pageIndex,_muscleFilter);
+                  manager.updateWorkout(
+                    data,
+                    workout.id,
+                    _pageIndex,
+                    _muscleFilter,
+                  );
                 } else {
                   manager.createWorkout(data);
                 }

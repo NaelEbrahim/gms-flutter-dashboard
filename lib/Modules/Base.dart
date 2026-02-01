@@ -28,11 +28,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
     const Users(),
     const Classes(),
     const Programs(),
-    Workouts(),
-    Meals(),
-    Sessions(),
-    Events(),
-    Articles()
+    const Workouts(),
+    const Meals(),
+    const Sessions(),
+    const Events(),
+    const Articles(),
   ];
 
   @override
@@ -58,7 +58,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         builder: (context, state) {
           return Row(
             children: [
-              /// Sidebar
+              // Sidebar
               Container(
                 width: Constant.screenWidth / 5,
                 color: Colors.teal,
@@ -69,7 +69,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   },
                 ),
               ),
-              /// Main Content
+              // Main Content
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(10),

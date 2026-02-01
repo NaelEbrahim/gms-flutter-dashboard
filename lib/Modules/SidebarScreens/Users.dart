@@ -36,8 +36,7 @@ class _UsersState extends State<Users> {
   @override
   void initState() {
     super.initState();
-    final manager = Manager.get(context);
-    manager.getUsers(_roleFilter, _pageIndex);
+    Manager.get(context).getUsers(_roleFilter, _pageIndex);
     _searchController.addListener(() => setState(() {}));
   }
 
@@ -273,6 +272,7 @@ class _UsersState extends State<Users> {
           icon: const Icon(Icons.person_add),
           label: const Text('Create User'),
         ),
+        const SizedBox(width: 16),
         Components.reusableText(
           content: 'Total Users: ${displayedUsers.length}',
           fontSize: 15,

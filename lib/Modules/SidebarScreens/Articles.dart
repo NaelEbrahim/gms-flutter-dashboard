@@ -34,8 +34,7 @@ class _ArticlesState extends State<Articles> {
   @override
   void initState() {
     super.initState();
-    final manager = Manager.get(context);
-    manager.getArticles(_pageIndex, _typeFilter);
+    Manager.get(context).getArticles(_pageIndex, _typeFilter);
     _searchController.addListener(() => setState(() {}));
   }
 

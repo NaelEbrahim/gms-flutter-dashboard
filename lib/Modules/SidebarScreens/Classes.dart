@@ -30,8 +30,7 @@ class _ClassesState extends State<Classes> {
   @override
   void initState() {
     super.initState();
-    final manager = Manager.get(context);
-    manager.getClasses(_pageIndex);
+    Manager.get(context).getClasses(_pageIndex);
     _searchController.addListener(() => setState(() {}));
   }
 

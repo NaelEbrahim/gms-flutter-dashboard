@@ -24,8 +24,7 @@ class _EventsState extends State<Events> {
   @override
   void initState() {
     super.initState();
-    Manager manager = Manager.get(context);
-    manager.getEvents(_pageIndex);
+    Manager.get(context).getEvents(_pageIndex);
     _searchController.addListener(() => setState(() {}));
   }
 

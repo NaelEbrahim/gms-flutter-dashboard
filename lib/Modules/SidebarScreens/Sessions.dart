@@ -32,8 +32,7 @@ class _SessionsState extends State<Sessions> {
   @override
   void initState() {
     super.initState();
-    Manager manager = Manager.get(context);
-    manager.getSessions(_pageIndex);
+    Manager.get(context).getSessions(_pageIndex);
     _searchController.addListener(() => setState(() {}));
   }
 
