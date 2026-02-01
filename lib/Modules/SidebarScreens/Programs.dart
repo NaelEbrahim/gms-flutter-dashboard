@@ -18,7 +18,15 @@ class Programs extends StatefulWidget {
 class _ProgramsState extends State<Programs> {
   int _pageIndex = 0;
   final TextEditingController _searchController = TextEditingController();
-  final availableDays = ['Day_1', 'Day_2', 'Day_3', 'Day_4', 'Day_5', 'Day_6', 'Day_7'];
+  final availableDays = [
+    'Day_1',
+    'Day_2',
+    'Day_3',
+    'Day_4',
+    'Day_5',
+    'Day_6',
+    'Day_7',
+  ];
   List<String> programLevels = ['Beginner', 'Intermediate', 'Advanced'];
 
   List<ProgramModel> _filteredPrograms(List<ProgramModel> programs) {
@@ -202,13 +210,16 @@ class _ProgramsState extends State<Programs> {
   Widget _buildFilters(Manager manager, List<ProgramModel> displayedPrograms) {
     return Row(
       children: [
-        SizedBox(
-          width: Constant.screenWidth / 4,
-          child: Components.reusableTextFormField(
-            hint: 'Search by title or level',
-            prefixIcon: Icons.search,
-            controller: _searchController,
-            validator: (_) => null,
+        Expanded(
+          flex: 2,
+          child: SizedBox(
+            width: Constant.screenWidth / 4,
+            child: Components.reusableTextFormField(
+              hint: 'Search by title or level',
+              prefixIcon: Icons.search,
+              controller: _searchController,
+              validator: (_) => null,
+            ),
           ),
         ),
         const SizedBox(width: 12),
@@ -220,7 +231,6 @@ class _ProgramsState extends State<Programs> {
             manager.getPrograms(_pageIndex);
           },
         ),
-        const SizedBox(width: 12),
         const Spacer(),
         ElevatedButton.icon(
           onPressed: () => _showProgramDialog(context, manager),
@@ -230,6 +240,7 @@ class _ProgramsState extends State<Programs> {
         const SizedBox(width: 15.0),
         Components.reusableText(
           content: 'Total Programs: ${displayedPrograms.length}',
+          fontSize: 15,
           fontWeight: FontWeight.bold,
         ),
       ],
@@ -269,7 +280,7 @@ class _ProgramsState extends State<Programs> {
                 ),
                 const SizedBox(height: 10),
                 DropdownButtonFormField<String>(
-                  value: selectedLevel,
+                  initialValue: selectedLevel,
                   dropdownColor: Colors.grey[900],
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.trending_up),

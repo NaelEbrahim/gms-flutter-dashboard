@@ -267,29 +267,16 @@ class _UsersState extends State<Users> {
             manager.getUsers(_roleFilter, pageIndex);
           },
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          flex: 2,
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: Wrap(
-              spacing: 16,
-              runSpacing: 8,
-              alignment: WrapAlignment.end,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () => showUserFormDialog(context, manager),
-                  icon: const Icon(Icons.person_add),
-                  label: const Text('Create User'),
-                ),
-                Components.reusableText(
-                  content: 'Total Users: ${displayedUsers.length}',
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-              ],
-            ),
-          ),
+        const Spacer(),
+        ElevatedButton.icon(
+          onPressed: () => showUserFormDialog(context, manager),
+          icon: const Icon(Icons.person_add),
+          label: const Text('Create User'),
+        ),
+        Components.reusableText(
+          content: 'Total Users: ${displayedUsers.length}',
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
         ),
       ],
     );

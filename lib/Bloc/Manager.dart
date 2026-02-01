@@ -6,6 +6,7 @@ import 'package:gms_flutter_windows/Models/ArticleModel.dart';
 import 'package:gms_flutter_windows/Models/ClassModel.dart';
 import 'package:gms_flutter_windows/Models/EventModel.dart';
 import 'package:gms_flutter_windows/Models/LoginModel.dart';
+import 'package:gms_flutter_windows/Models/MealModel.dart';
 import 'package:gms_flutter_windows/Models/ProgramModel.dart';
 import 'package:gms_flutter_windows/Models/SessionModel.dart';
 import 'package:gms_flutter_windows/Models/UserModel.dart';
@@ -719,7 +720,7 @@ class Manager extends Cubit<BlocStates> {
         });
   }
 
-  void createArticle(Map<String,dynamic> data) async {
+  void createArticle(Map<String, dynamic> data) async {
     emit(LoadingState());
     Dio_Linker.postData(url: CREATEARTICLE, data: data)
         .then((value) {
@@ -739,7 +740,12 @@ class Manager extends Cubit<BlocStates> {
         });
   }
 
-  void updateArticle(Map<String,dynamic> data, int articleId, int page, String type) {
+  void updateArticle(
+    Map<String, dynamic> data,
+    int articleId,
+    int page,
+    String type,
+  ) {
     emit(LoadingState());
     Dio_Linker.putData(url: EDITARTICLE + articleId.toString(), data: data)
         .then((value) {
@@ -749,6 +755,140 @@ class Manager extends Cubit<BlocStates> {
             Components.showSnackBar(
               navigator.context,
               'article Updated',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  GetWorkoutsModel workouts = GetWorkoutsModel(
+    count: 0,
+    totalPages: 1,
+    currentPage: 0,
+    items: [],
+  );
+
+  void getWorkouts(int page, String muscle) async {
+    if (isLoading) return;
+    isLoading = true;
+    emit(LoadingState());
+    Dio_Linker.getData(
+          url: GETALLWORKOUTS,
+          params: {'page': page, 'size': paginationSize, 'muscle': muscle},
+        )
+        .then((value) {
+          isLoading = false;
+          workouts = GetWorkoutsModel.fromJson(value.data['message']);
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+          isLoading = false;
+        });
+  }
+
+  void createWorkout(FormData data) async {
+    emit(LoadingState());
+    Dio_Linker.postData(url: CREATEWORKOUT, data: data)
+        .then((value) {
+          getWorkouts(0, 'All');
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'workout created',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void updateWorkout(FormData data, int workoutId, int page, String type) {
+    emit(LoadingState());
+    Dio_Linker.putData(url: UPDATEWORKOUT + workoutId.toString(), data: data)
+        .then((value) {
+          getWorkouts(page, type);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'workout Updated',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  GetMealsModel meals = GetMealsModel(
+    count: 0,
+    totalPages: 1,
+    currentPage: 0,
+    meals: [],
+  );
+
+  void getMeals(int page) async {
+    if (isLoading) return;
+    isLoading = true;
+    emit(LoadingState());
+    Dio_Linker.getData(
+          url: GETMEALS,
+          params: {'page': page, 'size': paginationSize},
+        )
+        .then((value) {
+          isLoading = false;
+          meals = GetMealsModel.fromJson(value.data['message']);
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+          isLoading = false;
+        });
+  }
+
+  void createMeal(FormData data) async {
+    emit(LoadingState());
+    Dio_Linker.postData(url: CREATEMEAL, data: data)
+        .then((value) {
+          getMeals(0);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'meal created',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void updateMeal(FormData data, int mealId, int page) {
+    emit(LoadingState());
+    Dio_Linker.putData(url: UPDATEMEAL + mealId.toString(), data: data)
+        .then((value) {
+          getMeals(page);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'meal Updated',
               color: Colors.green,
             );
           }

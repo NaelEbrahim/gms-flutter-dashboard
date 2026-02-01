@@ -202,13 +202,16 @@ class _ClassesState extends State<Classes> {
   Widget _buildFilters(Manager manager, List<ClassModel> displayedClasses) {
     return Row(
       children: [
-        SizedBox(
-          width: Constant.screenWidth / 4,
-          child: Components.reusableTextFormField(
-            hint: 'Search by title or coach',
-            prefixIcon: Icons.search,
-            controller: _searchController,
-            validator: (_) => null,
+        Expanded(
+          flex: 2,
+          child: SizedBox(
+            width: Constant.screenWidth / 4,
+            child: Components.reusableTextFormField(
+              hint: 'Search by title or coach',
+              prefixIcon: Icons.search,
+              controller: _searchController,
+              validator: (_) => null,
+            ),
           ),
         ),
         const SizedBox(width: 12),
@@ -220,7 +223,6 @@ class _ClassesState extends State<Classes> {
             manager.getClasses(_pageIndex);
           },
         ),
-        const SizedBox(width: 12),
         const Spacer(),
         ElevatedButton.icon(
           onPressed: () => _showClassDialog(context, manager),
@@ -230,6 +232,7 @@ class _ClassesState extends State<Classes> {
         const SizedBox(width: 15.0),
         Components.reusableText(
           content: 'Total Classes: ${displayedClasses.length}',
+          fontSize: 15,
           fontWeight: FontWeight.bold,
         ),
       ],
@@ -351,10 +354,10 @@ class _ClassesState extends State<Classes> {
   }
 
   void _showProgramsDialog(
-      BuildContext mainContext,
-      Manager manager,
-      ClassModel cls,
-      ) {
+    BuildContext mainContext,
+    Manager manager,
+    ClassModel cls,
+  ) {
     int? selectedProgramId;
     showDialog(
       context: mainContext,
@@ -385,16 +388,16 @@ class _ClassesState extends State<Classes> {
                         items: manager.allPrograms.items
                             .where(
                               (p) => !cls.programs.any((cp) => cp.id == p.id),
-                        )
+                            )
                             .map(
                               (program) => DropdownMenuItem(
-                            value: program.id,
-                            child: Text(
-                              program.name,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        )
+                                value: program.id,
+                                child: Text(
+                                  program.name,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            )
                             .toList(),
                         onChanged: (v) {
                           setState(() => selectedProgramId = v);
@@ -407,12 +410,12 @@ class _ClassesState extends State<Classes> {
                       onPressed: selectedProgramId == null
                           ? null
                           : () async {
-                         manager.assignProgram({
-                          'classId': cls.id,
-                          'programId': selectedProgramId,
-                        }, _pageIndex);
-                        Navigator.pop(context);
-                      },
+                              manager.assignProgram({
+                                'classId': cls.id,
+                                'programId': selectedProgramId,
+                              }, _pageIndex);
+                              Navigator.pop(context);
+                            },
                     ),
                   ],
                 ),
@@ -420,46 +423,47 @@ class _ClassesState extends State<Classes> {
                 Expanded(
                   child: cls.programs.isEmpty
                       ? Components.reusableText(
-                    content: 'No programs assigned',
-                    fontColor: Colors.white,
-                  )
+                          content: 'No programs assigned',
+                          fontColor: Colors.white,
+                        )
                       : ListView.separated(
-                    itemCount: cls.programs.length,
-                    separatorBuilder: (_, _) =>
-                    const Divider(color: Colors.grey),
-                    itemBuilder: (_, index) {
-                      final program = cls.programs[index];
-                      return Row(
-                        children: [
-                          Expanded(
-                            child: Components.reusableText(
-                              content: program.name,
-                              fontSize: 15,
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.remove_circle,
-                              color: Colors.red,
-                            ),
-                            onPressed: () {
+                          itemCount: cls.programs.length,
+                          separatorBuilder: (_, _) =>
+                              const Divider(color: Colors.grey),
+                          itemBuilder: (_, index) {
+                            final program = cls.programs[index];
+                            return Row(
+                              children: [
+                                Expanded(
+                                  child: Components.reusableText(
+                                    content: program.name,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.remove_circle,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () {
                                     Components.deleteDialog<Manager>(
-                                context,
-                                    () async {
+                                      context,
+                                      () async {
                                         manager.unAssignProgram({
-                                    'classId': cls.id,
-                                    'programId': program.id,
-                                  }, _pageIndex);
-                                },
-                                body: 'Un-assign this program?',
-                              ).then((_){Navigator.pop(mainContext);});
-
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+                                          'classId': cls.id,
+                                          'programId': program.id,
+                                        }, _pageIndex);
+                                      },
+                                      body: 'Un-assign this program?',
+                                    ).then((_) {
+                                      Navigator.pop(mainContext);
+                                    });
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
                 ),
               ],
             ),
@@ -474,5 +478,4 @@ class _ClassesState extends State<Classes> {
       ),
     );
   }
-
 }

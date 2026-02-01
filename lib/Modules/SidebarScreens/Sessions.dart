@@ -194,13 +194,16 @@ class _SessionsState extends State<Sessions> {
   Widget _buildFilters(List<SessionModel> displayed, Manager manager) {
     return Row(
       children: [
-        SizedBox(
-          width: Constant.screenWidth / 4,
-          child: Components.reusableTextFormField(
-            hint: 'Search by title, class, or coach',
-            prefixIcon: Icons.search,
-            controller: _searchController,
-            validator: (_) => null,
+        Expanded(
+          flex: 2,
+          child: SizedBox(
+            width: Constant.screenWidth / 4,
+            child: Components.reusableTextFormField(
+              hint: 'Search by title, class, or coach',
+              prefixIcon: Icons.search,
+              controller: _searchController,
+              validator: (_) => null,
+            ),
           ),
         ),
         const SizedBox(width: 12),
@@ -221,6 +224,7 @@ class _SessionsState extends State<Sessions> {
         const SizedBox(width: 15),
         Components.reusableText(
           content: 'Total Sessions: ${displayed.length}',
+          fontSize: 15,
           fontWeight: FontWeight.bold,
         ),
       ],
@@ -328,7 +332,10 @@ class _SessionsState extends State<Sessions> {
                     dropdownColor: Colors.grey[900],
                     decoration: const InputDecoration(
                       prefixIcon: Icon(Icons.fitness_center),
-                      label: Text('Class',style: TextStyle(color: Colors.white),),
+                      label: Text(
+                        'Class',
+                        style: TextStyle(color: Colors.white),
+                      ),
                       fillColor: Colors.black54,
                       filled: true,
                       border: OutlineInputBorder(),
@@ -354,7 +361,10 @@ class _SessionsState extends State<Sessions> {
                     dropdownColor: Colors.grey[900],
                     decoration: const InputDecoration(
                       prefixIcon: Icon(Icons.person),
-                      label: Text('Coach',style: TextStyle(color: Colors.white),),
+                      label: Text(
+                        'Coach',
+                        style: TextStyle(color: Colors.white),
+                      ),
                       fillColor: Colors.black54,
                       filled: true,
                       border: OutlineInputBorder(),

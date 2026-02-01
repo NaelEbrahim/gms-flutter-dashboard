@@ -64,13 +64,16 @@ class _EventsState extends State<Events> {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  SizedBox(
-                    width: Constant.screenWidth / 4,
-                    child: Components.reusableTextFormField(
-                      hint: 'Search by title',
-                      prefixIcon: Icons.search,
-                      validator: (_) => null,
-                      controller: _searchController,
+                  Expanded(
+                    flex: 2,
+                    child: SizedBox(
+                      width: Constant.screenWidth / 4,
+                      child: Components.reusableTextFormField(
+                        hint: 'Search by title',
+                        prefixIcon: Icons.search,
+                        validator: (_) => null,
+                        controller: _searchController,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -83,9 +86,10 @@ class _EventsState extends State<Events> {
                     },
                   ),
                   const Spacer(),
-                  ElevatedButton(
+                  ElevatedButton.icon(
                     onPressed: () => _showEventDialog(context, manager),
-                    child: const Text('Create Event'),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Create Event'),
                   ),
                   const SizedBox(width: 16),
                   Components.reusableText(

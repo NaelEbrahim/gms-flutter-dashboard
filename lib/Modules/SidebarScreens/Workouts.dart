@@ -4,38 +4,52 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:gms_flutter_windows/Bloc/Manager.dart';
 import 'package:gms_flutter_windows/Bloc/States.dart';
-import 'package:gms_flutter_windows/Models/ArticleModel.dart';
+import 'package:gms_flutter_windows/Models/WorkoutModel.dart';
 import 'package:gms_flutter_windows/Shared/Components.dart';
 import 'package:gms_flutter_windows/Shared/Constant.dart';
 
-class Articles extends StatefulWidget {
-  const Articles({super.key});
+class Workouts extends StatefulWidget {
+  const Workouts({super.key});
 
   @override
-  State<Articles> createState() => _ArticlesState();
+  State<Workouts> createState() => _WorkoutsState();
 }
 
-class _ArticlesState extends State<Articles> {
+class _WorkoutsState extends State<Workouts> {
   int _pageIndex = 0;
-  String _typeFilter = 'All';
+  String _muscleFilter = 'All';
   final TextEditingController _searchController = TextEditingController();
 
-  List<ArticleModel> _filteredArticles(GetArticlesModel articles) {
+  final muscles = [
+    'All',
+    'Chest',
+    'Back',
+    'Shoulders',
+    'Biceps',
+    'Triceps',
+    'Forearms',
+    'Abs',
+    'Glutes',
+    'Quadriceps',
+    'Hamstrings',
+    'Calves',
+  ];
+
+  List<WorkoutModel> _filteredWorkouts(GetWorkoutsModel workouts) {
     final search = _searchController.text.toLowerCase();
-    return articles.items.where((article) {
+    return workouts.items.where((w) {
       final matchesSearch =
-          search.isEmpty || article.title.toLowerCase().contains(search);
-      final matchesType =
-          _typeFilter == 'All' || article.wikiType == _typeFilter;
-      return matchesSearch && matchesType;
+          search.isEmpty || w.title.toLowerCase().contains(search);
+      final matchesMuscle =
+          _muscleFilter == 'All' || w.primaryMuscle == _muscleFilter;
+      return matchesSearch && matchesMuscle;
     }).toList();
   }
 
   @override
   void initState() {
     super.initState();
-    final manager = Manager.get(context);
-    manager.getArticles(_pageIndex, _typeFilter);
+    Manager.get(context).getWorkouts(_pageIndex, _muscleFilter);
     _searchController.addListener(() => setState(() {}));
   }
 
@@ -53,23 +67,22 @@ class _ArticlesState extends State<Articles> {
     return BlocConsumer<Manager, BlocStates>(
       listener: (_, _) {},
       builder: (context, state) {
-        final displayedArticles = _filteredArticles(manager.articles);
-
+        final displayedWorkouts = _filteredWorkouts(manager.workouts);
         return Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Components.reusableText(
-                content: 'Articles',
+                content: 'Workouts',
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
                 fontColor: Colors.teal,
               ),
               const SizedBox(height: 16),
-              _buildTypeTabs(manager),
+              _buildMuscleTabs(manager),
               const SizedBox(height: 16),
-              _buildSearchBar(manager, displayedArticles),
+              _buildSearchBar(manager, displayedWorkouts),
               const SizedBox(height: 24),
               ConditionalBuilder(
                 condition: state is! LoadingState,
@@ -99,15 +112,15 @@ class _ArticlesState extends State<Articles> {
                               headingRowAlignment: MainAxisAlignment.center,
                             ),
                             DataColumn(
-                              label: Center(child: Text('Wiki Type')),
+                              label: Center(child: Text('Primary Muscle')),
                               headingRowAlignment: MainAxisAlignment.center,
                             ),
                             DataColumn(
-                              label: Center(child: Text('Min Read')),
+                              label: Center(child: Text('Secondary Muscle')),
                               headingRowAlignment: MainAxisAlignment.center,
                             ),
                             DataColumn(
-                              label: Center(child: Text('Author')),
+                              label: Center(child: Text('Avg Calories')),
                               headingRowAlignment: MainAxisAlignment.center,
                             ),
                             DataColumn(
@@ -115,27 +128,29 @@ class _ArticlesState extends State<Articles> {
                               headingRowAlignment: MainAxisAlignment.center,
                             ),
                           ],
-                          rows: displayedArticles.map((a) {
+                          rows: displayedWorkouts.map((w) {
                             return DataRow(
                               cells: [
                                 DataCell(
                                   Center(
                                     child: Text(
-                                      a.title.length > 30
-                                          ? '${a.title.substring(0, 30)}...'
-                                          : a.title,
+                                      w.title.length > 30
+                                          ? '${w.title.substring(0, 30)}...'
+                                          : w.title,
                                       style: const TextStyle(fontSize: 14),
                                     ),
                                   ),
                                 ),
-                                DataCell(Center(child: Text(a.wikiType))),
+                                DataCell(Center(child: Text(w.primaryMuscle))),
                                 DataCell(
-                                  Center(child: Text('${a.minReadTime} min')),
+                                  Center(
+                                    child: Text(w.secondaryMuscles ?? "-"),
+                                  ),
                                 ),
                                 DataCell(
                                   Center(
                                     child: Text(
-                                      '${a.admin.firstName} ${a.admin.lastName}',
+                                      w.baseAvgCalories.toStringAsFixed(1),
                                     ),
                                   ),
                                 ),
@@ -150,10 +165,10 @@ class _ArticlesState extends State<Articles> {
                                             Icons.edit,
                                             color: Colors.teal,
                                           ),
-                                          onPressed: () => _showArticleDialog(
+                                          onPressed: () => _showWorkoutDialog(
                                             context,
                                             manager,
-                                            a,
+                                            w,
                                           ),
                                         ),
                                         IconButton(
@@ -162,7 +177,7 @@ class _ArticlesState extends State<Articles> {
                                             color: Colors.red,
                                           ),
                                           onPressed: () {
-                                            // TODO : implement Delete
+                                            // TODO delete
                                           },
                                         ),
                                       ],
@@ -187,19 +202,18 @@ class _ArticlesState extends State<Articles> {
     );
   }
 
-  Widget _buildTypeTabs(Manager manager) {
-    final types = ['All', 'Supplements', 'Health', 'Fitness'];
+  Widget _buildMuscleTabs(Manager manager) {
     return SizedBox(
       height: 45,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        children: types.map((type) {
-          final active = _typeFilter == type;
+        children: muscles.map((m) {
+          final active = _muscleFilter == m;
           return InkWell(
             onTap: () {
-              setState(() => _typeFilter = type);
+              setState(() => _muscleFilter = m);
               _pageIndex = 0;
-              manager.getArticles(_pageIndex, _typeFilter);
+              manager.getWorkouts(_pageIndex, m);
             },
             child: Container(
               margin: const EdgeInsets.only(right: 8),
@@ -210,7 +224,7 @@ class _ArticlesState extends State<Articles> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Components.reusableText(
-                content: type,
+                content: m,
                 fontColor: active ? Colors.black : Colors.white,
                 fontWeight: FontWeight.bold,
               ),
@@ -223,7 +237,7 @@ class _ArticlesState extends State<Articles> {
 
   Widget _buildSearchBar(
     Manager manager,
-    List<ArticleModel> displayedArticles,
+    List<WorkoutModel> displayedWorkouts,
   ) {
     return Row(
       children: [
@@ -233,55 +247,52 @@ class _ArticlesState extends State<Articles> {
             width: 300,
             child: Components.reusableTextFormField(
               hint: 'Search by title',
-              validator: (_) => null,
               prefixIcon: Icons.search,
+              validator: (_) => null,
               controller: _searchController,
             ),
           ),
         ),
         const SizedBox(width: 16),
         Components.reusablePagination(
-          totalPages: manager.articles.totalPages,
-          currentPage: manager.articles.currentPage,
+          totalPages: manager.workouts.totalPages,
+          currentPage: manager.workouts.currentPage,
           onPageChanged: (pageIndex) {
             _pageIndex = pageIndex;
-            manager.getArticles(_pageIndex, _typeFilter);
+            manager.getWorkouts(pageIndex, _muscleFilter);
           },
         ),
         const Spacer(),
         ElevatedButton.icon(
-          onPressed: () => _showArticleDialog(context, manager),
+          onPressed: () => _showWorkoutDialog(context, manager),
           icon: const Icon(Icons.add),
-          label: const Text('Create Article'),
+          label: const Text('Create Workout'),
         ),
         const SizedBox(width: 16),
         Components.reusableText(
-          content: 'Total Articles: ${displayedArticles.length}',
+          content: 'Total Workouts: ${displayedWorkouts.length}',
+          fontSize: 15,
           fontWeight: FontWeight.bold,
         ),
       ],
     );
   }
 
-  void _showArticleDialog(
+  void _showWorkoutDialog(
     BuildContext context,
     Manager manager, [
-    ArticleModel? article,
+    WorkoutModel? workout,
   ]) {
-    final isEdit = article != null;
+    final isEdit = workout != null;
 
-    final titleCtrl = TextEditingController(text: article?.title ?? '');
-    final contentCtrl = TextEditingController(text: article?.content ?? '');
+    final titleCtrl = TextEditingController(text: workout?.title ?? '');
+    final descCtrl = TextEditingController(text: workout?.description ?? '');
+    final avgCaloriesCtrl = TextEditingController(
+      text: workout?.baseAvgCalories.toString() ?? '',
+    );
 
-    final List<String> wikiTypes = [
-      'Health',
-      'Sport',
-      'Food',
-      'Fitness',
-      'Supplements',
-    ];
-
-    String? selectedWikiType = article?.wikiType;
+    String? primaryMuscle = workout?.primaryMuscle;
+    String? secondaryMuscle = workout?.secondaryMuscles;
 
     showDialog(
       context: context,
@@ -289,57 +300,91 @@ class _ArticlesState extends State<Articles> {
         builder: (context, setState) => AlertDialog(
           backgroundColor: Colors.grey[900],
           title: Components.reusableText(
-            content: isEdit ? 'Edit Article' : 'Create Article',
+            content: isEdit ? 'Edit Workout' : 'Create Workout',
             fontSize: 20,
             fontWeight: FontWeight.bold,
             fontColor: Colors.teal,
           ),
           content: SizedBox(
-            width: 400,
+            width: 420,
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Components.reusableTextFormField(
                     hint: 'Title',
-                    prefixIcon: Icons.title,
+                    prefixIcon: Icons.fitness_center,
                     controller: titleCtrl,
                   ),
                   const SizedBox(height: 10),
                   Components.reusableTextFormField(
-                    hint: 'Content',
+                    hint: 'Description',
                     prefixIcon: Icons.description,
-                    controller: contentCtrl,
-                    maxLines: 6,
+                    controller: descCtrl,
+                    maxLines: 4,
                   ),
                   const SizedBox(height: 10),
+                  // Primary muscle
                   DropdownButtonFormField<String>(
-                    initialValue: selectedWikiType,
+                    initialValue: primaryMuscle,
                     dropdownColor: Colors.grey[900],
                     decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.info, color: Colors.grey),
                       label: Text(
-                        'Wiki Type',
+                        'Primary Muscle',
                         style: TextStyle(color: Colors.white),
                       ),
-                      fillColor: Colors.black54,
-                      filled: true,
-                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(
+                        Icons.accessibility,
+                        color: Colors.white,
+                      ),
                     ),
-                    items: wikiTypes
+                    items: muscles
                         .map(
-                          (type) => DropdownMenuItem(
-                            value: type,
+                          (m) => DropdownMenuItem(
+                            value: m,
                             child: Text(
-                              type,
+                              m,
                               style: const TextStyle(color: Colors.white),
                             ),
                           ),
                         )
                         .toList(),
-                    onChanged: (value) {
-                      setState(() => selectedWikiType = value);
-                    },
+                    onChanged: (v) => setState(() => primaryMuscle = v),
+                  ),
+                  const SizedBox(height: 10),
+                  // Secondary muscle
+                  DropdownButtonFormField<String>(
+                    initialValue: secondaryMuscle,
+                    dropdownColor: Colors.grey[900],
+                    decoration: const InputDecoration(
+                      label: Text(
+                        'Secondary Muscle (optional)',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      prefixIcon: Icon(
+                        Icons.accessibility_new,
+                        color: Colors.white,
+                      ),
+                    ),
+                    items: muscles
+                        .where((m) => m != primaryMuscle)
+                        .map(
+                          (m) => DropdownMenuItem(
+                            value: m,
+                            child: Text(
+                              m,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (v) => setState(() => secondaryMuscle = v),
+                  ),
+                  const SizedBox(height: 10),
+                  Components.reusableTextFormField(
+                    hint: 'Avg Calories',
+                    prefixIcon: Icons.local_fire_department,
+                    controller: avgCaloriesCtrl,
                   ),
                 ],
               ),
@@ -353,24 +398,21 @@ class _ArticlesState extends State<Articles> {
             ElevatedButton(
               onPressed: () {
                 if (titleCtrl.text.isEmpty ||
-                    contentCtrl.text.isEmpty ||
-                    selectedWikiType == null) {
+                    primaryMuscle == null ||
+                    avgCaloriesCtrl.text.isEmpty) {
                   return;
                 }
-                final data = {
+                final data = FormData.fromMap({
                   'title': titleCtrl.text,
-                  'content': contentCtrl.text,
-                  'wikiType': selectedWikiType,
-                };
+                  'description': descCtrl.text,
+                  'primaryMuscle': primaryMuscle,
+                  'secondaryMuscle': secondaryMuscle,
+                  'avgCalories': double.parse(avgCaloriesCtrl.text),
+                });
                 if (isEdit) {
-                  manager.updateArticle(
-                    data,
-                    article.id,
-                    _pageIndex,
-                    _typeFilter,
-                  );
+                  manager.updateWorkout(data, workout.id,_pageIndex,_muscleFilter);
                 } else {
-                  manager.createArticle(data);
+                  manager.createWorkout(data);
                 }
                 Navigator.pop(context);
               },

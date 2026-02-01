@@ -5,9 +5,11 @@ import 'package:gms_flutter_windows/Bloc/States.dart';
 import 'package:gms_flutter_windows/Modules/SidebarScreens/Articles.dart';
 import 'package:gms_flutter_windows/Modules/SidebarScreens/Classes.dart';
 import 'package:gms_flutter_windows/Modules/SidebarScreens/Events.dart';
+import 'package:gms_flutter_windows/Modules/SidebarScreens/Meals.dart';
 import 'package:gms_flutter_windows/Modules/SidebarScreens/Programs.dart';
 import 'package:gms_flutter_windows/Modules/SidebarScreens/Sessions.dart';
 import 'package:gms_flutter_windows/Modules/SidebarScreens/Users.dart';
+import 'package:gms_flutter_windows/Modules/SidebarScreens/Workouts.dart';
 import 'package:gms_flutter_windows/Shared/Components.dart';
 import 'package:gms_flutter_windows/Shared/Constant.dart';
 import 'package:gms_flutter_windows/Shared/Sidebar.dart';
@@ -26,6 +28,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
     const Users(),
     const Classes(),
     const Programs(),
+    Workouts(),
+    Meals(),
     Sessions(),
     Events(),
     Articles()
