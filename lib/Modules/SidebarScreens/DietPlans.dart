@@ -28,9 +28,10 @@ class _DietPlansState extends State<DietPlans> {
   @override
   void initState() {
     super.initState();
-    Manager.get(context).getDietPlans(_pageIndex);
-    Manager.get(context).getCoaches();
-    Manager.get(context).getAllMeals();
+    Manager manager = Manager.get(context);
+    manager.getDietPlans(_pageIndex)
+        .then((_) => manager.getCoaches())
+        .then((_) => manager.getAllMeals());
     _searchController.addListener(() => setState(() {}));
   }
 
@@ -585,7 +586,10 @@ class _DietPlansState extends State<DietPlans> {
                                                               ),
                                                               onPressed: () =>
                                                                   setState(() {
-                                                                    if (editQuantity > 1) {editQuantity -= 5;
+                                                                    if (editQuantity >
+                                                                        1) {
+                                                                      editQuantity -=
+                                                                          5;
                                                                     }
                                                                   }),
                                                             ),
@@ -624,11 +628,15 @@ class _DietPlansState extends State<DietPlans> {
                                                           ElevatedButton(
                                                             onPressed: () {
                                                               manager.updateAssignedMeal({
-                                                                'dietId': plan.id,
-                                                                'mealId': meal.id,
+                                                                'dietId':
+                                                                    plan.id,
+                                                                'mealId':
+                                                                    meal.id,
                                                                 'day': dayName,
-                                                                'mealTime': mealTime,
-                                                                'quantity': editQuantity,
+                                                                'mealTime':
+                                                                    mealTime,
+                                                                'quantity':
+                                                                    editQuantity,
                                                               }, _pageIndex);
                                                               Navigator.pop(
                                                                 context,
@@ -650,8 +658,11 @@ class _DietPlansState extends State<DietPlans> {
                                                   color: Colors.red,
                                                 ),
                                                 onPressed: () {
-                                                  Components.deleteDialog<Manager>(
-                                                        context, () async {
+                                                  Components.deleteDialog<
+                                                        Manager
+                                                      >(
+                                                        context,
+                                                        () async {
                                                           manager.unAssignMeal({
                                                             'dietId': plan.id,
                                                             'mealId': meal.id,
@@ -660,11 +671,14 @@ class _DietPlansState extends State<DietPlans> {
                                                                 mealTime,
                                                           }, _pageIndex);
                                                         },
-                                                        body: 'Remove this meal?',
+                                                        body:
+                                                            'Remove this meal?',
                                                       )
                                                       .then(
-                                                        (_) => Navigator.pop(mainContext,),
-                                                  );
+                                                        (_) => Navigator.pop(
+                                                          mainContext,
+                                                        ),
+                                                      );
                                                 },
                                               ),
                                             ],

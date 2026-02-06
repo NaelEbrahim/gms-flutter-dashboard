@@ -187,11 +187,11 @@ class Manager extends Cubit<BlocStates> {
     items: [],
   );
 
-  void getClasses(int page) async {
+  Future<void> getClasses(int page) async {
     if (isLoading) return;
     isLoading = true;
     emit(LoadingState());
-    Dio_Linker.getData(
+    return Dio_Linker.getData(
           url: GETCLASSES,
           params: {'page': page, 'size': paginationSize},
         )
@@ -216,7 +216,7 @@ class Manager extends Cubit<BlocStates> {
   );
   bool isBaseLoading = false;
 
-  void getCoaches() {
+  void getCoaches(){
     if (isBaseLoading) return;
     isBaseLoading = true;
     emit(LoadingState());
@@ -336,11 +336,11 @@ class Manager extends Cubit<BlocStates> {
     items: [],
   );
 
-  void getAllUsers() {
+  Future<void> getAllUsers() async{
     if (isBaseLoading) return;
     isBaseLoading = true;
     emit(LoadingState());
-    Dio_Linker.getData(url: GETUSERS, params: {'role': 'User'})
+    return Dio_Linker.getData(url: GETUSERS, params: {'role': 'User'})
         .then((value) {
           isBaseLoading = false;
           allUsers = GetUsersModel.fromJson(value.data['message']);
@@ -442,11 +442,11 @@ class Manager extends Cubit<BlocStates> {
     items: [],
   );
 
-  void getPrograms(int page) async {
+  Future<void> getPrograms(int page) async {
     if (isLoading) return;
     isLoading = true;
     emit(LoadingState());
-    Dio_Linker.getData(
+    return Dio_Linker.getData(
           url: GETALLPROGRAMS,
           params: {'page': page, 'size': paginationSize},
         )
@@ -569,11 +569,11 @@ class Manager extends Cubit<BlocStates> {
     items: [],
   );
 
-  void getSessions(int page) async {
+  Future<void> getSessions(int page) async {
     if (isLoading) return;
     isLoading = true;
     emit(LoadingState());
-    Dio_Linker.getData(
+    return Dio_Linker.getData(
           url: GETALLSESSIONS,
           params: {'page': page, 'size': paginationSize},
         )
@@ -969,11 +969,11 @@ class Manager extends Cubit<BlocStates> {
     items: [],
   );
 
-  void getDietPlans(int page) async {
+  Future<void> getDietPlans(int page) async {
     if (isLoading) return;
     isLoading = true;
     emit(LoadingState());
-    Dio_Linker.getData(
+    return Dio_Linker.getData(
           url: GETDIETPLANS,
           params: {'page': page, 'size': paginationSize},
         )

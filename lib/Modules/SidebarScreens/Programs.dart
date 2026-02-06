@@ -40,8 +40,8 @@ class _ProgramsState extends State<Programs> {
   @override
   void initState() {
     super.initState();
-    Manager.get(context).getPrograms(_pageIndex);
-    Manager.get(context).getAllWorkouts();
+    Manager manager = Manager.get(context);
+    manager.getPrograms(_pageIndex).then((_) => manager.getAllWorkouts());
     _searchController.addListener(() => setState(() {}));
   }
 

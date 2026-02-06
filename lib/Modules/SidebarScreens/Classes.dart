@@ -30,9 +30,10 @@ class _ClassesState extends State<Classes> {
   @override
   void initState() {
     super.initState();
-    Manager.get(context).getClasses(_pageIndex);
-    Manager.get(context).getCoaches();
-    Manager.get(context).getAllPrograms();
+    Manager manager = Manager.get(context);
+    manager.getClasses(_pageIndex)
+        .then((_) => manager.getCoaches())
+        .then((_) => manager.getAllPrograms());
     _searchController.addListener(() => setState(() {}));
   }
 

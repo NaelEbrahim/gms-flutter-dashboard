@@ -28,36 +28,37 @@ class _AssignmentDetailsScreenState extends State<AssignmentDetails>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     Manager manager = Manager.get(context);
-    manager.getAllUsers();
-    switch (widget.type) {
-      case 'CLASS':
-        {
-          manager.getClasses(0);
-          break;
-        }
-      case 'SESSION':
-        {
-          manager.getSessions(0);
-          break;
-        }
-      case 'PROGRAM':
-        {
-          manager.getPrograms(0);
-          break;
-        }
-      case 'DIET_PLAN':
-        {
-          manager.getDietPlans(0);
-          break;
-        }
-    }
+    manager.getAllUsers().then((_) {
+      switch (widget.type) {
+        case 'CLASS':
+          {
+            manager.getClasses(0);
+            break;
+          }
+        case 'SESSION':
+          {
+            manager.getSessions(0);
+            break;
+          }
+        case 'PROGRAM':
+          {
+            manager.getPrograms(0);
+            break;
+          }
+        case 'DIET_PLAN':
+          {
+            manager.getDietPlans(0);
+            break;
+          }
+      }
+    });
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {
         setState(() {
           selectedTargetId = null;
           selectedUserId = null;
-          if (Manager.get(context).subscribersModel != null) {
-            Manager.get(context).subscribersModel!.subscribers.clear();
+          if (manager.subscribersModel != null) {
+            manager.subscribersModel!.subscribers.clear();
           }
           userAssignments.clear();
         });
