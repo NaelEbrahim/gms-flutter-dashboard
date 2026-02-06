@@ -2,7 +2,7 @@ import 'package:gms_flutter_windows/Models/WorkoutModel.dart';
 
 class ProgramModel {
   final int id;
-  final String name;
+  final String title;
   final String level;
   final bool isPublic;
   final double rate;
@@ -10,7 +10,7 @@ class ProgramModel {
 
   ProgramModel({
     required this.id,
-    required this.name,
+    required this.title,
     required this.level,
     required this.isPublic,
     required this.rate,
@@ -20,7 +20,7 @@ class ProgramModel {
   factory ProgramModel.fromJson(Map<String, dynamic> json) {
     return ProgramModel(
       id: json['id'],
-      name: json['name'],
+      title: json['name'],
       level: json['level'],
       isPublic: json['isPublic'],
       rate: (json['rate'] as num).toDouble(),

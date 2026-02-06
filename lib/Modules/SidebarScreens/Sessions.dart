@@ -33,6 +33,8 @@ class _SessionsState extends State<Sessions> {
   void initState() {
     super.initState();
     Manager.get(context).getSessions(_pageIndex);
+    Manager.get(context).getAllClasses();
+    Manager.get(context).getCoaches();
     _searchController.addListener(() => setState(() {}));
   }
 
@@ -344,7 +346,7 @@ class _SessionsState extends State<Sessions> {
                           (c) => DropdownMenuItem<int>(
                             value: c.id,
                             child: Text(
-                              c.name,
+                              c.title,
                               style: const TextStyle(color: Colors.white),
                             ),
                           ),

@@ -32,7 +32,7 @@ class _ProgramsState extends State<Programs> {
   List<ProgramModel> _filteredPrograms(List<ProgramModel> programs) {
     final search = _searchController.text.toLowerCase();
     return programs.where((program) {
-      return program.name.toLowerCase().contains(search) ||
+      return program.title.toLowerCase().contains(search) ||
           program.level.toLowerCase().contains(search);
     }).toList();
   }
@@ -41,6 +41,7 @@ class _ProgramsState extends State<Programs> {
   void initState() {
     super.initState();
     Manager.get(context).getPrograms(_pageIndex);
+    Manager.get(context).getAllWorkouts();
     _searchController.addListener(() => setState(() {}));
   }
 
@@ -128,7 +129,7 @@ class _ProgramsState extends State<Programs> {
                                 DataCell(
                                   Center(
                                     child: Components.reusableText(
-                                      content: program.name,
+                                      content: program.title,
                                       fontSize: 14,
                                     ),
                                   ),
@@ -253,7 +254,7 @@ class _ProgramsState extends State<Programs> {
     ProgramModel? program,
   ]) {
     final isEdit = program != null;
-    final titleCtrl = TextEditingController(text: program?.name ?? '');
+    final titleCtrl = TextEditingController(text: program?.title ?? '');
     String? selectedLevel = program?.level;
     bool isPublic = program?.isPublic ?? true;
 
@@ -366,7 +367,7 @@ class _ProgramsState extends State<Programs> {
         builder: (context, setState) => AlertDialog(
           backgroundColor: Colors.grey[900],
           title: Components.reusableText(
-            content: 'Workouts - ${program.name}',
+            content: 'Workouts - ${program.title}',
             fontColor: Colors.teal,
             fontWeight: FontWeight.bold,
             fontSize: 20,

@@ -20,10 +20,13 @@ class Sidebar extends StatelessWidget {
       {'icon': Icons.fitness_center, 'label': 'Classes'},
       {'icon': Icons.newspaper, 'label': 'Programs'},
       {'icon': Icons.sports_gymnastics, 'label': 'Workouts'},
-      {'icon': Icons.food_bank_outlined, 'label': 'Meals'},
-      {'icon': Icons.calendar_today, 'label': 'Sessions'},
+      {'icon': Icons.restaurant_outlined, 'label': 'DietPlans'},
+      {'icon': Icons.schedule, 'label': 'Sessions'},
+      {'icon': Icons.fastfood, 'label': 'Meals'},
+      {'icon': Icons.assignment_turned_in_outlined, 'label': 'Assignments'},
       {'icon': Icons.event, 'label': 'Events'},
       {'icon': Icons.article, 'label': 'Articles'},
+      {'icon': Icons.info, 'label': 'Info'},
     ];
 
     return Container(

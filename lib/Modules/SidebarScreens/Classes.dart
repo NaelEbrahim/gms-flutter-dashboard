@@ -22,7 +22,7 @@ class _ClassesState extends State<Classes> {
   List<ClassModel> _filteredClasses(List<ClassModel> allClasses) {
     final search = _searchController.text.toLowerCase();
     return allClasses.where((cls) {
-      return cls.name.toLowerCase().contains(search) ||
+      return cls.title.toLowerCase().contains(search) ||
           cls.coach.firstName.toLowerCase().contains(search);
     }).toList();
   }
@@ -31,6 +31,8 @@ class _ClassesState extends State<Classes> {
   void initState() {
     super.initState();
     Manager.get(context).getClasses(_pageIndex);
+    Manager.get(context).getCoaches();
+    Manager.get(context).getAllPrograms();
     _searchController.addListener(() => setState(() {}));
   }
 
@@ -118,7 +120,7 @@ class _ClassesState extends State<Classes> {
                                 DataCell(
                                   Center(
                                     child: Components.reusableText(
-                                      content: cls.name,
+                                      content: cls.title,
                                       fontSize: 14,
                                     ),
                                   ),
@@ -244,7 +246,7 @@ class _ClassesState extends State<Classes> {
     ClassModel? cls,
   ]) {
     final isEdit = cls != null;
-    final titleCtrl = TextEditingController(text: cls?.name ?? '');
+    final titleCtrl = TextEditingController(text: cls?.title ?? '');
     final descriptionCtrl = TextEditingController(text: cls?.description ?? '');
     final priceCtrl = TextEditingController(text: cls?.price.toString() ?? '');
     int? selectedCoachId = cls?.coach.id;
@@ -364,7 +366,7 @@ class _ClassesState extends State<Classes> {
         builder: (context, setState) => AlertDialog(
           backgroundColor: Colors.grey[900],
           title: Components.reusableText(
-            content: 'Programs - ${cls.name}',
+            content: 'Programs - ${cls.title}',
             fontColor: Colors.teal,
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -392,7 +394,7 @@ class _ClassesState extends State<Classes> {
                               (program) => DropdownMenuItem(
                                 value: program.id,
                                 child: Text(
-                                  program.name,
+                                  program.title,
                                   style: const TextStyle(color: Colors.white),
                                 ),
                               ),
@@ -435,7 +437,7 @@ class _ClassesState extends State<Classes> {
                               children: [
                                 Expanded(
                                   child: Components.reusableText(
-                                    content: program.name,
+                                    content: program.title,
                                     fontSize: 15,
                                   ),
                                 ),

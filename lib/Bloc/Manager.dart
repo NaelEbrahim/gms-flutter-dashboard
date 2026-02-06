@@ -2,13 +2,17 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gms_flutter_windows/Bloc/States.dart';
+import 'package:gms_flutter_windows/Models/AboutUsModel.dart';
 import 'package:gms_flutter_windows/Models/ArticleModel.dart';
 import 'package:gms_flutter_windows/Models/ClassModel.dart';
+import 'package:gms_flutter_windows/Models/DietPlanModel.dart';
 import 'package:gms_flutter_windows/Models/EventModel.dart';
+import 'package:gms_flutter_windows/Models/FAQModel.dart';
 import 'package:gms_flutter_windows/Models/LoginModel.dart';
 import 'package:gms_flutter_windows/Models/MealModel.dart';
 import 'package:gms_flutter_windows/Models/ProgramModel.dart';
 import 'package:gms_flutter_windows/Models/SessionModel.dart';
+import 'package:gms_flutter_windows/Models/SubscribersModel.dart';
 import 'package:gms_flutter_windows/Models/UserModel.dart';
 import 'package:gms_flutter_windows/Models/WorkoutModel.dart';
 import 'package:gms_flutter_windows/Modules/Base.dart';
@@ -215,16 +219,17 @@ class Manager extends Cubit<BlocStates> {
   void getCoaches() {
     if (isBaseLoading) return;
     isBaseLoading = true;
+    emit(LoadingState());
     Dio_Linker.getData(url: GETUSERS, params: {'role': 'Coach'})
         .then((value) {
           isBaseLoading = false;
           coaches = GetUsersModel.fromJson(value.data['message']);
-          getAllPrograms();
+          emit(SuccessState());
         })
         .catchError((error) {
+          isBaseLoading = false;
           String errorMessage = handleDioError(error);
           emit(ErrorState(errorMessage));
-          isBaseLoading = false;
         });
   }
 
@@ -238,14 +243,17 @@ class Manager extends Cubit<BlocStates> {
   void getAllPrograms() {
     if (isBaseLoading) return;
     isBaseLoading = true;
+    emit(LoadingState());
     Dio_Linker.getData(url: GETALLPROGRAMS)
         .then((value) {
           isBaseLoading = false;
           allPrograms = GetProgramsModel.fromJson(value.data['message']);
-          getAllWorkouts();
+          emit(SuccessState());
         })
         .catchError((error) {
           isBaseLoading = false;
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
         });
   }
 
@@ -259,14 +267,17 @@ class Manager extends Cubit<BlocStates> {
   void getAllWorkouts() {
     if (isBaseLoading) return;
     isBaseLoading = true;
+    emit(LoadingState());
     Dio_Linker.getData(url: GETALLWORKOUTS)
         .then((value) {
           isBaseLoading = false;
           allWorkouts = GetWorkoutsModel.fromJson(value.data['message']);
-          getAllClasses();
+          emit(SuccessState());
         })
         .catchError((error) {
           isBaseLoading = false;
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
         });
   }
 
@@ -280,13 +291,65 @@ class Manager extends Cubit<BlocStates> {
   void getAllClasses() {
     if (isBaseLoading) return;
     isBaseLoading = true;
+    emit(LoadingState());
     Dio_Linker.getData(url: GETCLASSES)
         .then((value) {
           isBaseLoading = false;
           allClasses = GetClassesModel.fromJson(value.data['message']);
+          emit(SuccessState());
         })
         .catchError((error) {
           isBaseLoading = false;
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  GetMealsModel allMeals = GetMealsModel(
+    count: 0,
+    totalPages: 1,
+    currentPage: 0,
+    meals: [],
+  );
+
+  void getAllMeals() {
+    if (isBaseLoading) return;
+    isBaseLoading = true;
+    emit(LoadingState());
+    Dio_Linker.getData(url: GETMEALS)
+        .then((value) {
+          isBaseLoading = false;
+          allMeals = GetMealsModel.fromJson(value.data['message']);
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          isBaseLoading = false;
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  GetUsersModel allUsers = GetUsersModel(
+    count: 0,
+    totalPages: 1,
+    currentPage: 0,
+    items: [],
+  );
+
+  void getAllUsers() {
+    if (isBaseLoading) return;
+    isBaseLoading = true;
+    emit(LoadingState());
+    Dio_Linker.getData(url: GETUSERS, params: {'role': 'User'})
+        .then((value) {
+          isBaseLoading = false;
+          allUsers = GetUsersModel.fromJson(value.data['message']);
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          isBaseLoading = false;
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
         });
   }
 
@@ -889,6 +952,529 @@ class Manager extends Cubit<BlocStates> {
             Components.showSnackBar(
               navigator.context,
               'meal Updated',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  GetDietPlansModel dietPlans = GetDietPlansModel(
+    count: 0,
+    totalPages: 1,
+    currentPage: 0,
+    items: [],
+  );
+
+  void getDietPlans(int page) async {
+    if (isLoading) return;
+    isLoading = true;
+    emit(LoadingState());
+    Dio_Linker.getData(
+          url: GETDIETPLANS,
+          params: {'page': page, 'size': paginationSize},
+        )
+        .then((value) {
+          isLoading = false;
+          dietPlans = GetDietPlansModel.fromJson(value.data['message']);
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+          isLoading = false;
+        });
+  }
+
+  void createDietPlan(Map<String, dynamic> data) async {
+    emit(LoadingState());
+    Dio_Linker.postData(url: CREATEDIETPLAN, data: data)
+        .then((value) {
+          getDietPlans(0);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'dietPlan created',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void updateDietPlan(Map<String, dynamic> data, int dietPlan, int page) {
+    emit(LoadingState());
+    Dio_Linker.putData(url: UPDATEDIETPLAN + dietPlan.toString(), data: data)
+        .then((value) {
+          getDietPlans(page);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'dietPlan Updated',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void assignMeal(Map<String, dynamic> data, int page) {
+    emit(LoadingState());
+    Dio_Linker.postData(url: ASSIGNMEALTODIET, data: data)
+        .then((value) {
+          getDietPlans(page);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'meal Assigned',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void unAssignMeal(Map<String, dynamic> data, int page) {
+    emit(LoadingState());
+    Dio_Linker.deleteData(url: UNASSIGNMEALFROMDIET, data: data)
+        .then((value) {
+          getDietPlans(page);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'meal Un-Assigned',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void updateAssignedMeal(Map<String, dynamic> data, int page) {
+    emit(LoadingState());
+    Dio_Linker.postData(url: UPDATEASSIGNEDMEAL, data: data)
+        .then((value) {
+          getDietPlans(page);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'assigned Updated',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void assignUserToClass(Map<String, dynamic> data) {
+    emit(LoadingState());
+    Dio_Linker.postData(url: ASSIGNUSERTOCLASS, data: data)
+        .then((value) {
+          emit(SuccessState());
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'user Subscribed',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void inActiveUserInClass(Map<String, dynamic> data) {
+    emit(LoadingState());
+    Dio_Linker.putData(url: INACTIVEUSERINCLASS, data: data)
+        .then((value) {
+          emit(SuccessState());
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'user inActivated',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  SubscribersModel? subscribersModel;
+
+  Future<void> getClassSubscribers(int classId) {
+    emit(LoadingState());
+    return Dio_Linker.getData(url: GETCLASSASSIGNMENT + classId.toString())
+        .then((value) {
+          subscribersModel = SubscribersModel.fromJson(value.data);
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void assignProgramToUser(Map<String, dynamic> data) {
+    emit(LoadingState());
+    Dio_Linker.postData(url: ASSIGNPROGRAMTOUSER, data: data)
+        .then((value) {
+          emit(SuccessState());
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'program Assigned to User',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  Future<void> getProgramSubscribers(int programId) {
+    emit(LoadingState());
+    return Dio_Linker.getData(url: GETPROGRAMASSIGNMENT + programId.toString())
+        .then((value) {
+          subscribersModel = SubscribersModel.fromJson(value.data);
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void unAssignProgramFromUser(Map<String, dynamic> data) {
+    emit(LoadingState());
+    Dio_Linker.deleteData(url: UNASSIGNPROGRAMTOUSER, data: data)
+        .then((value) {
+          emit(SuccessState());
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'program unAssigned from User',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  Future<void> getSessionSubscribers(int sessionId) {
+    emit(LoadingState());
+    return Dio_Linker.getData(url: GETSESSIONASSIGNMENT + sessionId.toString())
+        .then((value) {
+          subscribersModel = SubscribersModel.fromJson(value.data);
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void assignSessionToUser(Map<String, dynamic> data) {
+    emit(LoadingState());
+    Dio_Linker.postData(url: ASSIGNSESSIONTOUSER, data: data)
+        .then((value) {
+          emit(SuccessState());
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'session Assigned to User',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void unAssignSessionFromUser(Map<String, dynamic> data) {
+    emit(LoadingState());
+    Dio_Linker.deleteData(url: UNASSIGNSESSIONTOUSER, data: data)
+        .then((value) {
+          emit(SuccessState());
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'session unAssigned from User',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  Future<void> getDietSubscribers(int dietId) {
+    emit(LoadingState());
+    return Dio_Linker.getData(url: GETDIETASSIGNMENT + dietId.toString())
+        .then((value) {
+          subscribersModel = SubscribersModel.fromJson(value.data);
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void assignDietToUser(Map<String, dynamic> data) {
+    emit(LoadingState());
+    Dio_Linker.postData(url: ASSIGNDIETTOUSER, data: data)
+        .then((value) {
+          emit(SuccessState());
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'diet Plan Assigned to User',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void unAssignDietFromUser(Map<String, dynamic> data) {
+    emit(LoadingState());
+    Dio_Linker.deleteData(url: UNASSIGNDIETTOUSER, data: data)
+        .then((value) {
+          emit(SuccessState());
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'diet Plan unAssigned from User',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  Future<List<String>> getAllClassesForUser(int userId) async {
+    emit(LoadingState());
+    try {
+      final value = await Dio_Linker.getData(
+        url: GETUSERCLASSES + userId.toString(),
+      );
+      final result = (value.data as List)
+          .map((e) => e['name'] as String)
+          .toList();
+      emit(SuccessState());
+      return result;
+    } catch (error) {
+      final errorMessage = handleDioError(error);
+      emit(ErrorState(errorMessage));
+      return [];
+    }
+  }
+
+  Future<List<String>> getAllSessionsForUser(int userId) async {
+    emit(LoadingState());
+    try {
+      final value = await Dio_Linker.getData(
+        url: GETUSERSESSIONS + userId.toString(),
+      );
+      final result = (value.data as List)
+          .map((e) => e['title'] as String)
+          .toList();
+      emit(SuccessState());
+      return result;
+    } catch (error) {
+      final errorMessage = handleDioError(error);
+      emit(ErrorState(errorMessage));
+      return [];
+    }
+  }
+
+  Future<List<String>> getAllProgramsForUser(int userId) async {
+    emit(LoadingState());
+    try {
+      final value = await Dio_Linker.getData(
+        url: GETUSERPROGRAMS + userId.toString(),
+      );
+      final result = (value.data as List)
+          .map((e) => e['name'] as String)
+          .toList();
+      emit(SuccessState());
+      return result;
+    } catch (error) {
+      final errorMessage = handleDioError(error);
+      emit(ErrorState(errorMessage));
+      return [];
+    }
+  }
+
+  Future<List<String>> getAllDietsForUser(int userId) async {
+    emit(LoadingState());
+    try {
+      final value = await Dio_Linker.getData(
+        url: GETUSERDIETS + userId.toString(),
+      );
+      final result = (value.data as List)
+          .map((e) => e['title'] as String)
+          .toList();
+      emit(SuccessState());
+      return result;
+    } catch (error) {
+      final errorMessage = handleDioError(error);
+      emit(ErrorState(errorMessage));
+      return [];
+    }
+  }
+
+  AboutUsModel? gymInfo;
+
+  Future<void> getAboutUs() async {
+    emit(LoadingState());
+    Dio_Linker.getData(url: GETABOUTUS)
+        .then((value) {
+          gymInfo = AboutUsModel.fromJson(value.data['message']);
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  List<FAQModel> faqs = [];
+
+  Future<void> getFaqs() async {
+    emit(LoadingState());
+    Dio_Linker.getData(url: GETFAQ)
+        .then((value) {
+          faqs = FAQModel.parseList(value.data);
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  Future<void> createFaq(Map<String, dynamic> data) async {
+    emit(LoadingState());
+    await Dio_Linker.postData(url: CREATEFAQ, data: data)
+        .then((value) {
+          getFaqs();
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'FAQ added',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  Future<void> updateFaq(Map<String, dynamic> data, int faqId) async {
+    emit(LoadingState());
+    await Dio_Linker.putData(url: UPDATEFAQ + faqId.toString(), data: data)
+        .then((value) {
+          getFaqs();
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'FAQ updated',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  Future<void> deleteFaq(int faqId) async {
+    emit(LoadingState());
+    await Dio_Linker.postData(url: DELETEFAQ + faqId.toString())
+        .then((value) {
+          getFaqs();
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'FAQ deleted',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  Future<void> updateAboutUs(Map<String, dynamic> data) async {
+    emit(LoadingState());
+    await Dio_Linker.putData(url: UPADTEABOUTUS, data: data)
+        .then((value) {
+          getAboutUs();
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'About-us data updated',
               color: Colors.green,
             );
           }

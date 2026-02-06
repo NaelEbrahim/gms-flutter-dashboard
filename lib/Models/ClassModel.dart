@@ -3,7 +3,7 @@ import 'package:gms_flutter_windows/Models/UserModel.dart';
 
 class ClassModel {
   final int id;
-  final String name;
+  final String title;
   final String description;
   final double price;
   final UserModel coach;
@@ -11,7 +11,7 @@ class ClassModel {
 
   ClassModel({
     required this.id,
-    required this.name,
+    required this.title,
     required this.description,
     required this.price,
     required this.coach,
@@ -21,7 +21,7 @@ class ClassModel {
   factory ClassModel.fromJson(Map<String, dynamic> json) {
     return ClassModel(
       id: json['id'],
-      name: json['name'],
+      title: json['name'],
       description: json['description'],
       price: (json['price'] as num).toDouble(),
       coach: UserModel.fromJson(json['coach']),

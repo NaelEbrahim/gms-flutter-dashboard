@@ -516,11 +516,10 @@ class _EventsState extends State<Events> {
                                     color: Colors.teal,
                                   ),
                                   onPressed: () {
-                                    final newScore = int.tryParse(
+                                    final newScore = double.tryParse(
                                       scoreCtrl.text,
                                     );
                                     if (newScore == null) return;
-                                    // Api call
                                     manager.editUserScore({
                                       'userId': p.id,
                                       'eventId': event.id,

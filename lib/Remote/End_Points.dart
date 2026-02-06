@@ -26,10 +26,6 @@ const GETCLASSPROGRAMS = 'class/get-class-programs/';
 
 const GETSUBSCRIPTIONSHISTORY = 'class/get-user-subscriptions-history/';
 
-const GETFAQS = '/FAQ/show/all';
-
-const GETABOUTUS = 'FAQ/get-about-us';
-
 const GETWORKOUTPROGRESS = 'user/getProgressByRange';
 
 const CREATEUSER = 'user/createUser';
@@ -91,3 +87,59 @@ const GETMEALS = 'meal/show/all';
 const CREATEMEAL = 'meal/create';
 
 const UPDATEMEAL = 'meal/update/';
+
+const GETDIETPLANS = 'diet/show/all';
+
+const CREATEDIETPLAN = 'diet/create';
+
+const UPDATEDIETPLAN = 'diet/update/';
+
+const ASSIGNMEALTODIET = 'diet/assign-meal';
+
+const UPDATEASSIGNEDMEAL = 'diet/update-assign-meal';
+
+const UNASSIGNMEALFROMDIET = 'diet/unassign-meal';
+
+const ASSIGNUSERTOCLASS = 'class/new-subscription';
+
+const INACTIVEUSERINCLASS = 'class/inActive-user-subscription';
+
+const GETCLASSASSIGNMENT = 'class/subscribers-by-class/';
+
+const ASSIGNPROGRAMTOUSER = 'program/assign';
+
+const GETPROGRAMASSIGNMENT = 'program/get-members-in-program/';
+
+const UNASSIGNPROGRAMTOUSER = 'program/unassign';
+
+const GETSESSIONASSIGNMENT = 'session/get-members-in-session/';
+
+const ASSIGNSESSIONTOUSER = 'session/assign';
+
+const UNASSIGNSESSIONTOUSER = 'session/unassign';
+
+const GETDIETASSIGNMENT = 'diet/get-members-in-DietPlan/';
+
+const ASSIGNDIETTOUSER = 'diet/assign';
+
+const UNASSIGNDIETTOUSER = 'diet/unassign';
+
+const GETUSERCLASSES = 'class/get-user-subscription-classes/';
+
+const GETUSERSESSIONS = 'session/get-user-subscription-sessions/';
+
+const GETUSERPROGRAMS = 'program/get-user-subscription-programs/';
+
+const GETUSERDIETS = 'diet/get-user-subscription-diets/';
+
+const GETABOUTUS = 'FAQ/get-about-us';
+
+const GETFAQ = 'FAQ/show/all';
+
+const CREATEFAQ = 'FAQ/create';
+
+const UPDATEFAQ = 'FAQ/update/';
+
+const DELETEFAQ = 'FAQ/delete/';
+
+const UPADTEABOUTUS = 'FAQ/update-about-us';
