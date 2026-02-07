@@ -1553,7 +1553,6 @@ class Manager extends Cubit<BlocStates> {
           emit(SuccessState());
         })
         .catchError((error) {
-
           String errorMessage = handleDioError(error);
           emit(ErrorState(errorMessage));
         });

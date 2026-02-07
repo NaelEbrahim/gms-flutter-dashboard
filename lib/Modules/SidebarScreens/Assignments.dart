@@ -35,9 +35,9 @@ class Assignments extends StatelessWidget {
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
-              crossAxisSpacing: 30,
-              mainAxisSpacing: 20,
-              childAspectRatio: 2,
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 15,
+              childAspectRatio: 2.8,
               children: items.map((item) {
                 return InkWell(
                   onTap: () {
@@ -66,16 +66,20 @@ class Assignments extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          item['icon'] as IconData,
-                          size: 64,
-                          color: Colors.teal,
+                        Flexible(
+                          child: Icon(
+                            item['icon'] as IconData,
+                            size: 64,
+                            color: Colors.teal,
+                          ),
                         ),
                         const SizedBox(height: 16),
-                        Components.reusableText(
-                          content: item['title'].toString(),
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                        Flexible(
+                          child: Components.reusableText(
+                            content: item['title'].toString(),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
