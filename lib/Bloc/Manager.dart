@@ -10,6 +10,7 @@ import 'package:gms_flutter_windows/Models/EventModel.dart';
 import 'package:gms_flutter_windows/Models/FAQModel.dart';
 import 'package:gms_flutter_windows/Models/LoginModel.dart';
 import 'package:gms_flutter_windows/Models/MealModel.dart';
+import 'package:gms_flutter_windows/Models/PrivateCoachModel.dart';
 import 'package:gms_flutter_windows/Models/ProgramModel.dart';
 import 'package:gms_flutter_windows/Models/SessionModel.dart';
 import 'package:gms_flutter_windows/Models/SubscribersModel.dart';
@@ -216,7 +217,7 @@ class Manager extends Cubit<BlocStates> {
   );
   bool isBaseLoading = false;
 
-  void getCoaches(){
+  void getCoaches() {
     if (isBaseLoading) return;
     isBaseLoading = true;
     emit(LoadingState());
@@ -336,7 +337,7 @@ class Manager extends Cubit<BlocStates> {
     items: [],
   );
 
-  Future<void> getAllUsers() async{
+  Future<void> getAllUsers() async {
     if (isBaseLoading) return;
     isBaseLoading = true;
     emit(LoadingState());
@@ -1480,6 +1481,79 @@ class Manager extends Cubit<BlocStates> {
           }
         })
         .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void assignCoachToUser(Map<String, dynamic> data) async {
+    emit(LoadingState());
+    await Dio_Linker.postData(url: ASSIGNCOACHTOUSER, data: data)
+        .then((value) {
+          getUserCoaches(data['userId']);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'coach Assigned to user',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  void unAssignCoachFromUser(Map<String, dynamic> data) async {
+    emit(LoadingState());
+    await Dio_Linker.postData(url: UNASSIGNCOACHFROMUSER, data: data)
+        .then((value) {
+          getUserCoaches(data['userId']);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'coach unAssigned from user',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  List<UserPrivateCoachModel> userPrivateCoaches = [];
+
+  void getUserCoaches(int userId) async {
+    emit(LoadingState());
+    await Dio_Linker.getData(url: GETUSERCOACHES + userId.toString())
+        .then((value) {
+          userPrivateCoaches = UserPrivateCoachModel.parseList(
+            value.data['message'],
+          );
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  List<UserPrivateCoachModel> coachUsers = [];
+
+  void getCoachUsers(int coachId) async {
+    emit(LoadingState());
+    await Dio_Linker.getData(url: GETCOACHUSERS + coachId.toString())
+        .then((value) {
+          coachUsers = UserPrivateCoachModel.parseList(value.data['message']);
+          emit(SuccessState());
+        })
+        .catchError((error) {
+
           String errorMessage = handleDioError(error);
           emit(ErrorState(errorMessage));
         });

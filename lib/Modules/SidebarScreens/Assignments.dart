@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gms_flutter_windows/Modules/AssignmentDetails.dart';
+import 'package:gms_flutter_windows/Modules/PrivateCoaches.dart';
 import 'package:gms_flutter_windows/Shared/Components.dart';
 
 class Assignments extends StatelessWidget {
@@ -12,6 +13,11 @@ class Assignments extends StatelessWidget {
       {'title': 'Sessions', 'icon': Icons.schedule, 'type': 'SESSION'},
       {'title': 'Programs', 'icon': Icons.newspaper, 'type': 'PROGRAM'},
       {'title': 'Diet Plans', 'icon': Icons.restaurant, 'type': 'DIET_PLAN'},
+      {
+        'title': 'Private Coaches',
+        'icon': Icons.sports_kabaddi_outlined,
+        'type': 'PRIVATE_COACHES',
+      },
     ];
 
     return Padding(
@@ -35,15 +41,20 @@ class Assignments extends StatelessWidget {
               children: items.map((item) {
                 return InkWell(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => AssignmentDetails(
-                          type: item['type'].toString(),
-                          title: item['title'].toString(),
-                        ),
-                      ),
-                    );
+                    (item['type'] == 'PRIVATE_COACHES')
+                        ? Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => PrivateCoaches()),
+                          )
+                        : Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AssignmentDetails(
+                                type: item['type'].toString(),
+                                title: item['title'].toString(),
+                              ),
+                            ),
+                          );
                   },
                   borderRadius: BorderRadius.circular(16),
                   child: Card(

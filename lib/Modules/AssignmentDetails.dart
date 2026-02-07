@@ -27,40 +27,34 @@ class _AssignmentDetailsScreenState extends State<AssignmentDetails>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    Manager manager = Manager.get(context);
+    final manager = Manager.get(context);
+
     manager.getAllUsers().then((_) {
       switch (widget.type) {
         case 'CLASS':
-          {
-            manager.getClasses(0);
-            break;
-          }
+          manager.getClasses(0);
+          break;
         case 'SESSION':
-          {
-            manager.getSessions(0);
-            break;
-          }
+          manager.getSessions(0);
+          break;
         case 'PROGRAM':
-          {
-            manager.getPrograms(0);
-            break;
-          }
+          manager.getPrograms(0);
+          break;
         case 'DIET_PLAN':
-          {
-            manager.getDietPlans(0);
-            break;
-          }
+          manager.getDietPlans(0);
+          break;
       }
     });
+
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {
         setState(() {
-          selectedTargetId = null;
           selectedUserId = null;
+          selectedTargetId = null;
+          userAssignments.clear();
           if (manager.subscribersModel != null) {
             manager.subscribersModel!.subscribers.clear();
           }
-          userAssignments.clear();
         });
       }
     });
@@ -93,16 +87,19 @@ class _AssignmentDetailsScreenState extends State<AssignmentDetails>
             foregroundColor: Colors.white,
             title: Text(
               '${widget.title} Assignments',
-              style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.teal,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             bottom: TabBar(
               controller: _tabController,
-              labelStyle: TextStyle(
-                color: Colors.teal,
+              indicatorColor: Colors.tealAccent,
+              labelStyle: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
-              unselectedLabelColor: Colors.white,
+              unselectedLabelColor: Colors.white70,
               tabs: const [
                 Tab(text: 'By Entity'),
                 Tab(text: 'By User'),
@@ -111,12 +108,11 @@ class _AssignmentDetailsScreenState extends State<AssignmentDetails>
           ),
           body: ConditionalBuilder(
             condition: state is! LoadingState,
-            builder: (context) => TabBarView(
+            fallback: (_) => const Center(child: CircularProgressIndicator()),
+            builder: (_) => TabBarView(
               controller: _tabController,
               children: [_byEntityTab(manager), _byUserTab(manager)],
             ),
-            fallback: (context) =>
-                Center(child: const CircularProgressIndicator()),
           ),
         );
       },
@@ -125,75 +121,91 @@ class _AssignmentDetailsScreenState extends State<AssignmentDetails>
 
   Widget _byEntityTab(Manager manager) {
     final items = _getAssignableItems(manager, widget.type);
-    return Padding(
-      padding: const EdgeInsets.all(20),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          DropdownButtonFormField<int>(
-            dropdownColor: Colors.grey[850],
-            hint: Text(
-              'Select ${widget.type.toLowerCase()}',
-              style: const TextStyle(color: Colors.white),
+          _card(
+            DropdownButtonFormField<int>(
+              dropdownColor: Colors.black87,
+              initialValue: selectedTargetId,
+              decoration: _input('Select ${widget.type.toLowerCase()}'),
+              items: items.map((item) {
+                return DropdownMenuItem<int>(
+                  value: item.id,
+                  child: Text(
+                    item.title,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                );
+              }).toList(),
+              onChanged: (v) async {
+                if (v == null) return;
+                selectedTargetId = v;
+                manager.subscribersModel = null;
+                setState(() {});
+                switch (widget.type) {
+                  case 'CLASS':
+                    await manager.getClassSubscribers(v);
+                    break;
+                  case 'SESSION':
+                    await manager.getSessionSubscribers(v);
+                    break;
+                  case 'PROGRAM':
+                    await manager.getProgramSubscribers(v);
+                    break;
+                  case 'DIET_PLAN':
+                    await manager.getDietSubscribers(v);
+                    break;
+                }
+                setState(() {});
+              },
             ),
-            items: items.map((item) {
-              return DropdownMenuItem<int>(
-                value: item.id,
-                child: Text(
-                  item.title,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              );
-            }).toList(),
-            onChanged: (v) async {
-              if (v == null) return;
-              selectedTargetId = v;
-              manager.subscribersModel = null;
-              setState(() {});
-              switch (widget.type) {
-                case 'CLASS':
-                  await manager.getClassSubscribers(v);
-                  break;
-                case 'SESSION':
-                  await manager.getSessionSubscribers(v);
-                  break;
-                case 'PROGRAM':
-                  await manager.getProgramSubscribers(v);
-                  break;
-                case 'DIET_PLAN':
-                  await manager.getDietSubscribers(v);
-                  break;
-              }
-              setState(() {});
-            },
           ),
           const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
-                child: DropdownButtonFormField<int>(
-                  dropdownColor: Colors.grey[850],
-                  hint: const Text(
-                    'User',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  items: manager.allUsers.items.map((u) {
-                    return DropdownMenuItem<int>(
-                      value: u.id,
-                      child: Text(
-                        '${u.firstName} ${u.lastName}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
+                child: _card(
+                  DropdownButtonFormField<int>(
+                    dropdownColor: Colors.black87,
+                    initialValue: selectedUserId,
+                    decoration: _input('Select User'),
+                    items: manager.allUsers.items.map((u) {
+                      return DropdownMenuItem<int>(
+                        value: u.id,
+                        child: Text(
+                          '${u.firstName} ${u.lastName}',
+                          style: const TextStyle(color: Colors.white),
                         ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (v) => setState(() => selectedUserId = v),
+                      );
+                    }).toList(),
+                    onChanged: (v) async {
+                      if (v == null) return;
+                      setState(() {
+                        selectedUserId = v;
+                      });
+                    },
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: const Icon(Icons.add_circle, color: Colors.teal),
+              const SizedBox(width: 12),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.add, color: Colors.white, size: 20),
+                label: const Text(
+                  'Assign',
+                  style: TextStyle(color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 14,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
                 onPressed: (selectedTargetId == null || selectedUserId == null)
                     ? null
                     : () {
@@ -227,31 +239,42 @@ class _AssignmentDetailsScreenState extends State<AssignmentDetails>
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: selectedTargetId == null
-                ? Center(
-                    child: Components.reusableText(
-                      content:
-                          'Please select ${widget.title.substring(0, widget.title.length - 1)}',
-                    ),
-                  )
-                : manager.subscribersModel == null
-                ? const Center(child: CircularProgressIndicator())
-                : ListView(
-                    children: manager.subscribersModel!.subscribers.map((u) {
-                      final isActive =
-                          manager.subscribersModel!.subscribersStatus[u.id
-                              .toString()] ??
-                          false;
-                      return ListTile(
-                        title: Components.reusableText(
-                          content: '${u.firstName} ${u.lastName}',
+          const SizedBox(height: 24),
+          selectedTargetId == null
+              ? _hint(
+                  'Please select ${widget.title.substring(0, widget.title.length - 1)}',
+                )
+              : manager.subscribersModel == null
+              ? const Center(child: CircularProgressIndicator())
+              : ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: manager.subscribersModel!.subscribers.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
+                  itemBuilder: (_, i) {
+                    final u = manager.subscribersModel!.subscribers[i];
+                    final isActive =
+                        manager.subscribersModel!.subscribersStatus[u.id
+                            .toString()] ??
+                        false;
+                    return _card(
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
                         ),
-                        subtitle: Components.reusableText(
-                          content: isActive ? 'Active' : 'Inactive',
-                          fontSize: 12,
-                          fontColor: isActive ? Colors.teal : Colors.red,
+                        title: Text(
+                          '${u.firstName} ${u.lastName}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Text(
+                          isActive ? 'Active' : 'Inactive',
+                          style: TextStyle(
+                            color: isActive ? Colors.teal : Colors.red,
+                          ),
                         ),
                         trailing: IconButton(
                           icon: const Icon(
@@ -294,8 +317,86 @@ class _AssignmentDetailsScreenState extends State<AssignmentDetails>
                             setState(() {});
                           },
                         ),
+                      ),
+                    );
+                  },
+                ),
+        ],
+      ),
+    );
+  }
+
+  Widget _byUserTab(Manager manager) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _card(
+            DropdownButtonFormField<int>(
+              dropdownColor: Colors.black87,
+              initialValue: selectedUserId,
+              decoration: _input('Select User'),
+              items: manager.allUsers.items.map((u) {
+                return DropdownMenuItem<int>(
+                  value: u.id,
+                  child: Text(
+                    '${u.firstName} ${u.lastName}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                );
+              }).toList(),
+              onChanged: (v) async {
+                if (v == null) return;
+                selectedUserId = v;
+                userAssignments.clear();
+                switch (widget.type) {
+                  case 'CLASS':
+                    userAssignments['Classes'] = await manager
+                        .getAllClassesForUser(v);
+                    break;
+                  case 'SESSION':
+                    userAssignments['Sessions'] = await manager
+                        .getAllSessionsForUser(v);
+                    break;
+                  case 'PROGRAM':
+                    userAssignments['Programs'] = await manager
+                        .getAllProgramsForUser(v);
+                    break;
+                  case 'DIET_PLAN':
+                    userAssignments['Diet Plans'] = await manager
+                        .getAllDietsForUser(v);
+                    break;
+                }
+                setState(() {});
+              },
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: userAssignments.isEmpty
+                ? _hint('Select user to view assignments')
+                : ListView.separated(
+                    itemCount: userAssignments.entries
+                        .expand((e) => e.value)
+                        .length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final allItems = userAssignments.entries
+                          .expand((e) => e.value)
+                          .toList();
+                      return _card(
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Text(
+                            '${index + 1}. ${allItems[index]}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       );
-                    }).toList(),
+                    },
                   ),
           ),
         ],
@@ -303,90 +404,51 @@ class _AssignmentDetailsScreenState extends State<AssignmentDetails>
     );
   }
 
-  Widget _byUserTab(Manager manager) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              DropdownButtonFormField<int>(
-                dropdownColor: Colors.grey[850],
-                hint: const Text(
-                  'Select User',
-                  style: TextStyle(color: Colors.white),
-                ),
-                items: manager.allUsers.items.map((u) {
-                  return DropdownMenuItem<int>(
-                    value: u.id,
-                    child: Text(
-                      '${u.firstName} ${u.lastName}',
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (v) async {
-                  if (v == null) return;
-                  userAssignments.clear();
-                  switch (widget.type) {
-                    case 'CLASS':
-                      {
-                        userAssignments['Classes'] = await manager
-                            .getAllClassesForUser(v);
-                        break;
-                      }
-                    case 'SESSION':
-                      {
-                        userAssignments['Sessions'] = await manager
-                            .getAllSessionsForUser(v);
-                        break;
-                      }
-                    case 'PROGRAM':
-                      {
-                        userAssignments['Programs'] = await manager
-                            .getAllProgramsForUser(v);
-                        break;
-                      }
-                    case 'DIET_PLAN':
-                      {
-                        userAssignments['Diet Plans'] = await manager
-                            .getAllDietsForUser(v);
-                        break;
-                      }
-                  }
-                  setState(() {});
-                },
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: userAssignments.isEmpty
-                    ? Center(
-                        child: Components.reusableText(
-                          content: 'Select user to view assignments',
-                        ),
-                      )
-                    : ListView(
-                        children: userAssignments.entries
-                            .expand((e) => e.value)
-                            .toList()
-                            .asMap()
-                            .entries
-                            .map(
-                              (entry) => ListTile(
-                                title: Components.reusableText(
-                                  content: '${entry.key + 1}. ${entry.value}',
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      ),
-              ),
-            ],
+  // Helpers
+  Widget _card(Widget child) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.black87,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(76),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
-        );
-      },
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  InputDecoration _input(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: Colors.white70),
+      enabledBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.white24),
+      ),
+      focusedBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.tealAccent),
+      ),
+      filled: true,
+      fillColor: Colors.black45,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    );
+  }
+
+  Widget _hint(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Center(
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.white60, fontSize: 14),
+        ),
+      ),
     );
   }
 

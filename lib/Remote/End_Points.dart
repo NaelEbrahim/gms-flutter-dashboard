@@ -143,3 +143,11 @@ const UPDATEFAQ = 'FAQ/update/';
 const DELETEFAQ = 'FAQ/delete/';
 
 const UPADTEABOUTUS = 'FAQ/update-about-us';
+
+const ASSIGNCOACHTOUSER = 'user/assignCoach';
+
+const UNASSIGNCOACHFROMUSER = 'user/unassignCoach';
+
+const GETUSERCOACHES = 'user/getUserPrivateCoaches/';
+
+const GETCOACHUSERS = 'user/get-coach-user/';
