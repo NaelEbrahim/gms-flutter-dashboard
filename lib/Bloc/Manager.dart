@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gms_flutter_windows/Bloc/States.dart';
 import 'package:gms_flutter_windows/Models/AboutUsModel.dart';
 import 'package:gms_flutter_windows/Models/ArticleModel.dart';
+import 'package:gms_flutter_windows/Models/AttendanceModel.dart';
 import 'package:gms_flutter_windows/Models/ClassModel.dart';
 import 'package:gms_flutter_windows/Models/DietPlanModel.dart';
 import 'package:gms_flutter_windows/Models/EventModel.dart';
@@ -1550,6 +1551,44 @@ class Manager extends Cubit<BlocStates> {
     await Dio_Linker.getData(url: GETCOACHUSERS + coachId.toString())
         .then((value) {
           coachUsers = UserPrivateCoachModel.parseList(value.data['message']);
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  List<AttendanceModel> attendanceList = [];
+
+  Future<void> getAllAttendance(String start, String end) async {
+    emit(LoadingState());
+    await Dio_Linker.getData(
+          url: GETALLATTENDANCEBYRANGE,
+          params: {'start': start, 'end': end},
+        )
+        .then((value) {
+          attendanceList = AttendanceModel.listFromJson(value.data['message']);
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  List<DateTime> userAttendanceDates = [];
+
+  Future<void> getUserAttendance(int userId, String start, String end) async {
+    emit(LoadingState());
+    await Dio_Linker.getData(
+          url: GETUSERATTENDANCEBYRANGE + userId.toString(),
+          params: {'start': start, 'end': end},
+        )
+        .then((value) {
+          userAttendanceDates = (value.data['message'] as List)
+              .map((e) => DateTime.parse(e))
+              .toList();
           emit(SuccessState());
         })
         .catchError((error) {

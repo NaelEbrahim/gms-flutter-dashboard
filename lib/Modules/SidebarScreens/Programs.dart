@@ -581,7 +581,7 @@ class _ProgramsState extends State<Programs> {
     WorkoutModel workout,
     String currentDay,
   ) {
-    int sets = workout.sets ?? 1;
+    int sets = workout.sets;
     int reps = workout.reps ?? 1;
     showDialog(
       context: context,

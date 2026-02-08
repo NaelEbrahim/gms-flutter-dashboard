@@ -1,25 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:gms_flutter_windows/Modules/AssignmentDetails.dart';
 import 'package:gms_flutter_windows/Modules/PrivateCoaches.dart';
+import 'package:gms_flutter_windows/Modules/SidebarScreens/Attendance.dart';
 import 'package:gms_flutter_windows/Shared/Components.dart';
 
-class Assignments extends StatelessWidget {
+class Assignments extends StatefulWidget {
   const Assignments({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final items = [
-      {'title': 'Classes', 'icon': Icons.fitness_center, 'type': 'CLASS'},
-      {'title': 'Sessions', 'icon': Icons.schedule, 'type': 'SESSION'},
-      {'title': 'Programs', 'icon': Icons.newspaper, 'type': 'PROGRAM'},
-      {'title': 'Diet Plans', 'icon': Icons.restaurant, 'type': 'DIET_PLAN'},
-      {
-        'title': 'Private Coaches',
-        'icon': Icons.sports_kabaddi_outlined,
-        'type': 'PRIVATE_COACHES',
-      },
-    ];
+  State<Assignments> createState() => _AssignmentsState();
+}
 
+class _AssignmentsState extends State<Assignments> {
+  final items = [
+    {'title': 'Classes', 'icon': Icons.fitness_center, 'type': 'CLASS'},
+    {'title': 'Sessions', 'icon': Icons.schedule, 'type': 'SESSION'},
+    {'title': 'Programs', 'icon': Icons.newspaper, 'type': 'PROGRAM'},
+    {'title': 'Diet Plans', 'icon': Icons.restaurant, 'type': 'DIET_PLAN'},
+    {
+      'title': 'Private Coaches',
+      'icon': Icons.sports_kabaddi_outlined,
+      'type': 'PRIVATE_COACHES',
+    },
+    {'title': 'Attendance', 'icon': Icons.how_to_reg, 'type': 'ATTENDANCE'},
+  ];
+
+  final Map<String, Widget Function()> routes = {
+    'PRIVATE_COACHES': () => PrivateCoaches(),
+    'ATTENDANCE': () => Attendance(),
+  };
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Column(
@@ -41,20 +53,18 @@ class Assignments extends StatelessWidget {
               children: items.map((item) {
                 return InkWell(
                   onTap: () {
-                    (item['type'] == 'PRIVATE_COACHES')
-                        ? Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => PrivateCoaches()),
-                          )
-                        : Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => AssignmentDetails(
+                    final builder = routes[item['type']];
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => builder != null
+                            ? builder()
+                            : AssignmentDetails(
                                 type: item['type'].toString(),
                                 title: item['title'].toString(),
                               ),
-                            ),
-                          );
+                      ),
+                    );
                   },
                   borderRadius: BorderRadius.circular(16),
                   child: Card(
