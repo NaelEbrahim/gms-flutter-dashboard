@@ -16,6 +16,7 @@ class Sessions extends StatefulWidget {
 
 class _SessionsState extends State<Sessions> {
   int _pageIndex = 0;
+  late Manager manager;
   final TextEditingController _searchController = TextEditingController();
 
   List<SessionModel> _filteredSessions(List<SessionModel> sessions) {
@@ -32,7 +33,7 @@ class _SessionsState extends State<Sessions> {
   @override
   void initState() {
     super.initState();
-    Manager manager = Manager.get(context);
+    manager = Manager.get(context);
     manager.getSessions(_pageIndex)
         .then((_) => manager.getAllClasses())
         .then((_) => manager.getCoaches());
@@ -42,6 +43,7 @@ class _SessionsState extends State<Sessions> {
   @override
   void dispose() {
     _searchController.dispose();
+    manager.sessions.items.clear();
     super.dispose();
   }
 

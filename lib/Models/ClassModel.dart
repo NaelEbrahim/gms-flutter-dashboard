@@ -25,7 +25,9 @@ class ClassModel {
       description: json['description'],
       price: (json['price'] as num).toDouble(),
       coach: UserModel.fromJson(json['coach']),
-      programs: ProgramModel.parseList(json['programs'])
+      programs: json['programs'] == null
+          ? <ProgramModel>[]
+          : ProgramModel.parseList(json['programs']),
     );
   }
 

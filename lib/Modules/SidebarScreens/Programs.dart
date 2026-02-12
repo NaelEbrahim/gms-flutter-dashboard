@@ -17,6 +17,7 @@ class Programs extends StatefulWidget {
 
 class _ProgramsState extends State<Programs> {
   int _pageIndex = 0;
+  late Manager manager;
   final TextEditingController _searchController = TextEditingController();
   final availableDays = [
     'Day_1',
@@ -40,7 +41,7 @@ class _ProgramsState extends State<Programs> {
   @override
   void initState() {
     super.initState();
-    Manager manager = Manager.get(context);
+    manager = Manager.get(context);
     manager.getPrograms(_pageIndex).then((_) => manager.getAllWorkouts());
     _searchController.addListener(() => setState(() {}));
   }
@@ -48,6 +49,7 @@ class _ProgramsState extends State<Programs> {
   @override
   void dispose() {
     _searchController.dispose();
+    manager.programs.items.clear();
     super.dispose();
   }
 

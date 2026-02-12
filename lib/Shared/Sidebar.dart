@@ -24,6 +24,7 @@ class Sidebar extends StatelessWidget {
       {'icon': Icons.schedule, 'label': 'Sessions'},
       {'icon': Icons.fastfood, 'label': 'Meals'},
       {'icon': Icons.assignment_turned_in_outlined, 'label': 'Assignments'},
+      {'icon': Icons.local_activity, 'label': 'Subscriptions'},
       {'icon': Icons.event, 'label': 'Events'},
       {'icon': Icons.article, 'label': 'Articles'},
       {'icon': Icons.info, 'label': 'Info'},

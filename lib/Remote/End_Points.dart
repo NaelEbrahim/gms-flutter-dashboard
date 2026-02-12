@@ -1,32 +1,14 @@
 const String LOGIN = 'user/login';
 
-const String USERCLASSES = 'class/my-classes';
-
-const String USERSESSIONS = 'session/my-sessions';
-
-const String USERDIETPLANS = 'diet/my-diets';
-
-const String USERPRIVATECOACHES = 'user/getUserPrivateCoaches/';
-
-const String USERHEALTHINFO = 'user/getHealthInfoByRange';
-
 const GETARTICLES = 'article/show/all';
 
 const GETUSERS = 'user/by-role';
-
-const UPDATECONVERSATIONLASTSEEN = 'chat/updateLastSeen';
 
 const REFRESHTOKEN = 'user/refresh';
 
 const LOGOUT = 'user/logout';
 
 const UPDATEUSER = 'user/updateProfile/';
-
-const GETCLASSPROGRAMS = 'class/get-class-programs/';
-
-const GETSUBSCRIPTIONSHISTORY = 'class/get-user-subscriptions-history/';
-
-const GETWORKOUTPROGRESS = 'user/getProgressByRange';
 
 const CREATEUSER = 'user/createUser';
 
@@ -155,3 +137,9 @@ const GETCOACHUSERS = 'user/get-coach-user/';
 const GETUSERATTENDANCEBYRANGE = 'user/user-attendance-by-range/';
 
 const GETALLATTENDANCEBYRANGE = 'user/all-attendance-by-range';
+
+const GETUSERSUBSCRIPTIONS = 'class/get-user-subscriptions-history/';
+
+const UPDATEUSERSUBSCRIPTION = 'class/update-subscription';
+
+const GETEXPIREDSUBSCRIPTIONS = 'class/get-expired-subscriptions/';

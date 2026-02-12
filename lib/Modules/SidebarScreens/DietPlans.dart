@@ -16,6 +16,7 @@ class DietPlans extends StatefulWidget {
 
 class _DietPlansState extends State<DietPlans> {
   int _pageIndex = 0;
+  late Manager manager;
   final TextEditingController _searchController = TextEditingController();
 
   List<DietPlanModel> _filteredPlans(GetDietPlansModel plans) {
@@ -28,8 +29,9 @@ class _DietPlansState extends State<DietPlans> {
   @override
   void initState() {
     super.initState();
-    Manager manager = Manager.get(context);
-    manager.getDietPlans(_pageIndex)
+    manager = Manager.get(context);
+    manager
+        .getDietPlans(_pageIndex)
         .then((_) => manager.getCoaches())
         .then((_) => manager.getAllMeals());
     _searchController.addListener(() => setState(() {}));
@@ -38,6 +40,7 @@ class _DietPlansState extends State<DietPlans> {
   @override
   void dispose() {
     _searchController.dispose();
+    manager.dietPlans.items.clear();
     super.dispose();
   }
 

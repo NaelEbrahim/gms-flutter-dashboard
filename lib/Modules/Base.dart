@@ -11,6 +11,7 @@ import 'package:gms_flutter_windows/Modules/SidebarScreens/Info.dart';
 import 'package:gms_flutter_windows/Modules/SidebarScreens/Meals.dart';
 import 'package:gms_flutter_windows/Modules/SidebarScreens/Programs.dart';
 import 'package:gms_flutter_windows/Modules/SidebarScreens/Sessions.dart';
+import 'package:gms_flutter_windows/Modules/SidebarScreens/Subscriptions.dart';
 import 'package:gms_flutter_windows/Modules/SidebarScreens/Users.dart';
 import 'package:gms_flutter_windows/Modules/SidebarScreens/Workouts.dart';
 import 'package:gms_flutter_windows/Shared/Components.dart';
@@ -36,9 +37,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
     const Sessions(),
     const Meals(),
     const Assignments(),
+    const Subscriptions(),
     const Events(),
     const Articles(),
-    const Info()
+    const Info(),
   ];
 
   @override
@@ -79,7 +81,25 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   color: Constant.scaffoldColor,
-                  child: _screens[_selectedIndex],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        onPressed: () {
+                          Manager.get(context).logout();
+                        },
+                        icon: Icon(Icons.logout, color: Colors.white),
+                        label: Text(
+                          'Logout',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      Expanded(child: _screens[_selectedIndex]),
+                    ],
+                  ),
                 ),
               ),
             ],

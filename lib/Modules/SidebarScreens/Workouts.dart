@@ -17,6 +17,7 @@ class Workouts extends StatefulWidget {
 
 class _WorkoutsState extends State<Workouts> {
   int _pageIndex = 0;
+  late Manager manager;
   String _muscleFilter = 'All';
   final TextEditingController _searchController = TextEditingController();
 
@@ -49,13 +50,15 @@ class _WorkoutsState extends State<Workouts> {
   @override
   void initState() {
     super.initState();
-    Manager.get(context).getWorkouts(_pageIndex, _muscleFilter);
+    manager = Manager.get(context);
+    manager.getWorkouts(_pageIndex, _muscleFilter);
     _searchController.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    manager.workouts.items.clear();
     super.dispose();
   }
 

@@ -17,6 +17,7 @@ class Users extends StatefulWidget {
 
 class _UsersState extends State<Users> {
   int _pageIndex = 0;
+  late Manager manager;
   String _roleFilter = 'All';
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _searchController = TextEditingController();
@@ -36,13 +37,15 @@ class _UsersState extends State<Users> {
   @override
   void initState() {
     super.initState();
-    Manager.get(context).getUsers(_roleFilter, _pageIndex);
+    manager = Manager.get(context);
+    manager.getUsers(_roleFilter, _pageIndex);
     _searchController.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    manager.users.items.clear();
     super.dispose();
   }
 

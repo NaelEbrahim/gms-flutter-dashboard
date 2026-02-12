@@ -17,6 +17,7 @@ class Meals extends StatefulWidget {
 
 class _MealsState extends State<Meals> {
   int _pageIndex = 0;
+  late Manager manager;
   final TextEditingController _searchController = TextEditingController();
 
   List<MealModel> _filteredMeals(GetMealsModel meals) {
@@ -29,13 +30,15 @@ class _MealsState extends State<Meals> {
   @override
   void initState() {
     super.initState();
-    Manager.get(context).getMeals(_pageIndex);
+    manager = Manager.get(context);
+    manager.getMeals(_pageIndex);
     _searchController.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    manager.meals.meals.clear();
     super.dispose();
   }
 

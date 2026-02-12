@@ -17,6 +17,7 @@ class Events extends StatefulWidget {
 
 class _EventsState extends State<Events> {
   int _pageIndex = 0;
+  late Manager manager;
   final TextEditingController _searchController = TextEditingController();
 
   List<EventModel> displayedEvents = [];
@@ -24,13 +25,15 @@ class _EventsState extends State<Events> {
   @override
   void initState() {
     super.initState();
-    Manager.get(context).getEvents(_pageIndex);
+    manager = Manager.get(context);
+    manager.getEvents(_pageIndex);
     _searchController.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    manager.events.items.clear();
     super.dispose();
   }
 

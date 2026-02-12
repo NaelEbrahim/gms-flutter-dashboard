@@ -17,27 +17,24 @@ class _PrivateCoachesState extends State<PrivateCoaches>
   int? _selectedUserId;
   int? _selectedCoachId;
   int? _assignCoachId;
+  late Manager manager;
 
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    manager = Manager.get(context);
     _tabController = TabController(length: 2, vsync: this);
-    final manager = Manager.get(context);
     manager.getAllUsers().then((_) => manager.getCoaches());
+  }
 
-    _tabController.addListener(() {
-      if (_tabController.indexIsChanging) {
-        setState(() {
-          _selectedUserId = null;
-          _selectedCoachId = null;
-          _assignCoachId = null;
-          manager.userPrivateCoaches.clear();
-          manager.coachUsers.clear();
-        });
-      }
-    });
+  @override
+  void dispose() {
+    _tabController.dispose();
+    manager.userPrivateCoaches.clear();
+    manager.coachUsers.clear();
+    super.dispose();
   }
 
   @override
@@ -168,8 +165,8 @@ class _PrivateCoachesState extends State<PrivateCoaches>
           ),
           const SizedBox(width: 12),
           ElevatedButton.icon(
-            icon: const Icon(Icons.add, size: 20),
-            label: const Text('Assign'),
+            icon: const Icon(Icons.add, size: 20, color: Colors.white),
+            label: const Text('Assign', style: TextStyle(color: Colors.white)),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.teal,
               shape: RoundedRectangleBorder(
@@ -207,13 +204,6 @@ class _PrivateCoachesState extends State<PrivateCoaches>
         return _card(
           Row(
             children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundImage: NetworkImage(
-                  coach.profileImagePath.toString(),
-                ),
-              ),
-              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

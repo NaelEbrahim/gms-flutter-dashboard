@@ -15,6 +15,7 @@ import 'package:gms_flutter_windows/Models/PrivateCoachModel.dart';
 import 'package:gms_flutter_windows/Models/ProgramModel.dart';
 import 'package:gms_flutter_windows/Models/SessionModel.dart';
 import 'package:gms_flutter_windows/Models/SubscribersModel.dart';
+import 'package:gms_flutter_windows/Models/SubscriptionModel.dart';
 import 'package:gms_flutter_windows/Models/UserModel.dart';
 import 'package:gms_flutter_windows/Models/WorkoutModel.dart';
 import 'package:gms_flutter_windows/Modules/Base.dart';
@@ -1589,6 +1590,58 @@ class Manager extends Cubit<BlocStates> {
           userAttendanceDates = (value.data['message'] as List)
               .map((e) => DateTime.parse(e))
               .toList();
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  List<SubscriptionModel> userSubscriptions = [];
+
+  Future<void> getUserSubscriptionsHistory(int userId) async {
+    emit(LoadingState());
+    await Dio_Linker.getData(url: GETUSERSUBSCRIPTIONS + userId.toString())
+        .then((value) {
+          userSubscriptions = SubscriptionModel.parseList(
+            value.data['message'],
+          );
+          emit(SuccessState());
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  Future<void> updateUserSubscription(Map<String, dynamic> data) async {
+    emit(LoadingState());
+    await Dio_Linker.postData(url: UPDATEUSERSUBSCRIPTION, data: data)
+        .then((value) {
+          getUserSubscriptionsHistory(data['userId']);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'subscription Updated',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  List<UserModel> expiredSubscriptions = [];
+
+  Future<void> getPendingPaymentsByClassId(int classId) async {
+    emit(LoadingState());
+    await Dio_Linker.getData(url: GETEXPIREDSUBSCRIPTIONS + classId.toString())
+        .then((value) {
+          expiredSubscriptions = UserModel.parseList(value.data['message']);
           emit(SuccessState());
         })
         .catchError((error) {

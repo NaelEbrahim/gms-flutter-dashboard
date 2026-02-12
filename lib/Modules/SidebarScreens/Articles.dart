@@ -17,6 +17,7 @@ class Articles extends StatefulWidget {
 class _ArticlesState extends State<Articles> {
   int _pageIndex = 0;
   String _typeFilter = 'All';
+  late Manager manager;
   final TextEditingController _searchController = TextEditingController();
 
   List<ArticleModel> _filteredArticles(GetArticlesModel articles) {
@@ -33,13 +34,15 @@ class _ArticlesState extends State<Articles> {
   @override
   void initState() {
     super.initState();
-    Manager.get(context).getArticles(_pageIndex, _typeFilter);
+    manager = Manager.get(context);
+    manager.getArticles(_pageIndex, _typeFilter);
     _searchController.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    manager.articles.items.clear();
     super.dispose();
   }
 

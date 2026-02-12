@@ -18,6 +18,7 @@ class Classes extends StatefulWidget {
 class _ClassesState extends State<Classes> {
   final TextEditingController _searchController = TextEditingController();
   int _pageIndex = 0;
+  late Manager manager;
 
   List<ClassModel> _filteredClasses(List<ClassModel> allClasses) {
     final search = _searchController.text.toLowerCase();
@@ -30,8 +31,9 @@ class _ClassesState extends State<Classes> {
   @override
   void initState() {
     super.initState();
-    Manager manager = Manager.get(context);
-    manager.getClasses(_pageIndex)
+    manager = Manager.get(context);
+    manager
+        .getClasses(_pageIndex)
         .then((_) => manager.getCoaches())
         .then((_) => manager.getAllPrograms());
     _searchController.addListener(() => setState(() {}));
@@ -40,6 +42,7 @@ class _ClassesState extends State<Classes> {
   @override
   void dispose() {
     _searchController.dispose();
+    manager.classes.items.clear();
     super.dispose();
   }
 
