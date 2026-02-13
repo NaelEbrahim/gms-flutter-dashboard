@@ -21,7 +21,7 @@ class MealModel {
     return MealModel(
       id: json['id'],
       title: json['title'],
-      imagePath: json['imagePath'] ?? '',
+      imagePath: json['imagePath'],
       baseCalories: (json['baseCalories'] as num).toDouble(),
       quantity: (json['quantity'] as num?)?.toDouble(),
       totalCalories: (json['totalCalories'] as num?)?.toDouble(),

@@ -143,3 +143,11 @@ const GETUSERSUBSCRIPTIONS = 'class/get-user-subscriptions-history/';
 const UPDATEUSERSUBSCRIPTION = 'class/update-subscription';
 
 const GETEXPIREDSUBSCRIPTIONS = 'class/get-expired-subscriptions/';
+
+const UPLOADWORKOUTIMAGE = 'workout/upload-image';
+
+const UPLOADMEALIMAGE = 'meal/upload-image';
+
+const UPLOADEVENTIMAGE = 'event/upload-image';
+
+const UPLOADCLASSIMAGE = 'class/upload-image';

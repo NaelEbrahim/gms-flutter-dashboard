@@ -137,6 +137,10 @@ class _EventsState extends State<Events> {
                               headingRowAlignment: MainAxisAlignment.center,
                             ),
                             DataColumn(
+                              label: Center(child: Text('Image')),
+                              headingRowAlignment: MainAxisAlignment.center,
+                            ),
+                            DataColumn(
                               label: Center(child: Text('Prizes')),
                               headingRowAlignment: MainAxisAlignment.center,
                             ),
@@ -170,6 +174,28 @@ class _EventsState extends State<Events> {
                                           .toIso8601String()
                                           .split('T')
                                           .first,
+                                    ),
+                                  ),
+                                ),
+                                DataCell(
+                                  Center(
+                                    child: ElevatedButton(
+                                      onPressed: () =>
+                                          Components.reusableImageViewerDialog(
+                                            context: context,
+                                            title: 'Event Image',
+                                            imageUrl: e.imagePath,
+                                            onUpdate: (data) async {
+                                              await manager.updateEventImage(
+                                                FormData.fromMap({
+                                                  'id': e.id,
+                                                  'image': data,
+                                                }),
+                                                _pageIndex,
+                                              );
+                                            },
+                                          ),
+                                      child: const Text('View'),
                                     ),
                                   ),
                                 ),

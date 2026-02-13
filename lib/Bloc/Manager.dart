@@ -1649,4 +1649,88 @@ class Manager extends Cubit<BlocStates> {
           emit(ErrorState(errorMessage));
         });
   }
+
+  Future<void> updateWorkoutImage(
+    FormData data,
+    int page,
+    String muscle,
+  ) async {
+    emit(LoadingState());
+    await Dio_Linker.putData(url: UPLOADWORKOUTIMAGE, data: data)
+        .then((value) {
+          getWorkouts(page, muscle);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'image Updated',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  Future<void> updateMealImage(FormData data, int page) async {
+    emit(LoadingState());
+    await Dio_Linker.putData(url: UPLOADMEALIMAGE, data: data)
+        .then((value) {
+          getMeals(page);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'image Updated',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  Future<void> updateEventImage(FormData data, int page) async {
+    emit(LoadingState());
+    await Dio_Linker.putData(url: UPLOADEVENTIMAGE, data: data)
+        .then((value) {
+          getEvents(page);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'image Updated',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
+
+  Future<void> updateClassImage(FormData data, int page) async {
+    emit(LoadingState());
+    await Dio_Linker.putData(url: UPLOADCLASSIMAGE, data: data)
+        .then((value) {
+          getClasses(page);
+          final navigator = MyApp.navigatorKey.currentState;
+          if (navigator != null) {
+            Components.showSnackBar(
+              navigator.context,
+              'image Updated',
+              color: Colors.green,
+            );
+          }
+        })
+        .catchError((error) {
+          String errorMessage = handleDioError(error);
+          emit(ErrorState(errorMessage));
+        });
+  }
 }

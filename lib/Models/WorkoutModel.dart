@@ -34,7 +34,7 @@ class WorkoutModel {
       secondaryMuscles: json['secondaryMuscles'] ?? '',
       totalBurnedCalories: (json['totalBurnedCalories'] as num).toDouble(),
       description: json['description'],
-      imagePath: json['imagePath'] ?? '',
+      imagePath: json['imagePath'],
       reps: json['reps'] as int?,
       sets: json['sets'],
       duration: json['duration'],

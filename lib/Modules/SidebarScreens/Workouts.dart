@@ -127,6 +127,10 @@ class _WorkoutsState extends State<Workouts> {
                               headingRowAlignment: MainAxisAlignment.center,
                             ),
                             DataColumn(
+                              label: Center(child: Text('Image')),
+                              headingRowAlignment: MainAxisAlignment.center,
+                            ),
+                            DataColumn(
                               label: Center(child: Text('Actions')),
                               headingRowAlignment: MainAxisAlignment.center,
                             ),
@@ -154,6 +158,29 @@ class _WorkoutsState extends State<Workouts> {
                                   Center(
                                     child: Text(
                                       w.baseAvgCalories.toStringAsFixed(1),
+                                    ),
+                                  ),
+                                ),
+                                DataCell(
+                                  Center(
+                                    child: ElevatedButton(
+                                      onPressed: () =>
+                                          Components.reusableImageViewerDialog(
+                                            context: context,
+                                            title: 'Workout Image',
+                                            imageUrl: w.imagePath,
+                                            onUpdate: (data) async {
+                                              await manager.updateWorkoutImage(
+                                                FormData.fromMap({
+                                                  'id': w.id,
+                                                  'image': data,
+                                                }),
+                                                _pageIndex,
+                                                _muscleFilter,
+                                              );
+                                            },
+                                          ),
+                                      child: const Text('View'),
                                     ),
                                   ),
                                 ),

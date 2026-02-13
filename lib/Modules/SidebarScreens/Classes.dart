@@ -110,6 +110,10 @@ class _ClassesState extends State<Classes> {
                               headingRowAlignment: MainAxisAlignment.center,
                             ),
                             DataColumn(
+                              label: Center(child: Text('Image')),
+                              headingRowAlignment: MainAxisAlignment.center,
+                            ),
+                            DataColumn(
                               label: Center(child: Text('Programs')),
                               headingRowAlignment: MainAxisAlignment.center,
                             ),
@@ -143,6 +147,28 @@ class _ClassesState extends State<Classes> {
                                       content:
                                           '${cls.coach.firstName} ${cls.coach.lastName}',
                                       fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                                DataCell(
+                                  Center(
+                                    child: ElevatedButton(
+                                      onPressed: () =>
+                                          Components.reusableImageViewerDialog(
+                                            context: context,
+                                            title: 'Class Image',
+                                            imageUrl: cls.imagePath,
+                                            onUpdate: (data) async {
+                                              await manager.updateClassImage(
+                                                FormData.fromMap({
+                                                  'id': cls.id,
+                                                  'image': data,
+                                                }),
+                                                _pageIndex,
+                                              );
+                                            },
+                                          ),
+                                      child: const Text('View'),
                                     ),
                                   ),
                                 ),

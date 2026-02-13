@@ -48,7 +48,7 @@ class _MealsState extends State<Meals> {
     final sidebarWidth = Constant.screenWidth / 5;
 
     return BlocConsumer<Manager, BlocStates>(
-      listener: (_, __) {},
+      listener: (_, _) {},
       builder: (context, state) {
         final displayedMeals = _filteredMeals(manager.meals);
 
@@ -102,6 +102,10 @@ class _MealsState extends State<Meals> {
                               headingRowAlignment: MainAxisAlignment.center,
                             ),
                             DataColumn(
+                              label: Center(child: Text('Image')),
+                              headingRowAlignment: MainAxisAlignment.center,
+                            ),
+                            DataColumn(
                               label: Center(child: Text('Actions')),
                               headingRowAlignment: MainAxisAlignment.center,
                             ),
@@ -131,6 +135,28 @@ class _MealsState extends State<Meals> {
                                   Center(
                                     child: Text(
                                       m.baseCalories.toStringAsFixed(1),
+                                    ),
+                                  ),
+                                ),
+                                DataCell(
+                                  Center(
+                                    child: ElevatedButton(
+                                      onPressed: () =>
+                                          Components.reusableImageViewerDialog(
+                                            context: context,
+                                            title: 'Meal Image',
+                                            imageUrl: m.imagePath,
+                                            onUpdate: (data) async {
+                                              await manager.updateMealImage(
+                                                FormData.fromMap({
+                                                  'id': m.id,
+                                                  'image': data,
+                                                }),
+                                                _pageIndex,
+                                              );
+                                            },
+                                          ),
+                                      child: const Text('View'),
                                     ),
                                   ),
                                 ),

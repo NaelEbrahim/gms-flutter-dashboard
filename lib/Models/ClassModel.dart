@@ -7,6 +7,7 @@ class ClassModel {
   final String description;
   final double price;
   final UserModel coach;
+  final String? imagePath;
   final List<ProgramModel> programs;
 
   ClassModel({
@@ -15,6 +16,7 @@ class ClassModel {
     required this.description,
     required this.price,
     required this.coach,
+    this.imagePath,
     required this.programs,
   });
 
@@ -25,6 +27,7 @@ class ClassModel {
       description: json['description'],
       price: (json['price'] as num).toDouble(),
       coach: UserModel.fromJson(json['coach']),
+      imagePath: json['imagePath'],
       programs: json['programs'] == null
           ? <ProgramModel>[]
           : ProgramModel.parseList(json['programs']),

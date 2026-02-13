@@ -1,7 +1,11 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gms_flutter_windows/Bloc/States.dart';
 import 'package:gms_flutter_windows/Shared/Constant.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Components {
   static Widget reusableText({
@@ -252,6 +256,117 @@ class Components {
           ),
         );
       },
+    );
+  }
+
+  static Widget reusableImagePicker({
+    required File? imageFile,
+    required void Function(File?) onImagePicked,
+    String buttonText = 'Upload Image',
+    double previewSize = 60,
+  }) {
+    final ImagePicker picker = ImagePicker();
+
+    return Row(
+      children: [
+        ElevatedButton.icon(
+          onPressed: () async {
+            final XFile? pickedFile = await picker.pickImage(
+              source: ImageSource.gallery,
+              imageQuality: 80,
+            );
+            if (pickedFile != null) {
+              onImagePicked(File(pickedFile.path));
+            }
+          },
+          icon: const Icon(Icons.image),
+          label: Text(buttonText),
+        ),
+        const SizedBox(width: 10),
+        if (imageFile != null)
+          SizedBox(
+            width: previewSize,
+            height: previewSize,
+            child: Image.file(imageFile, fit: BoxFit.cover),
+          ),
+      ],
+    );
+  }
+
+  static Future<void> reusableImageViewerDialog({
+    required BuildContext context,
+    required String title,
+    String? imageUrl,
+    required Future<void> Function(MultipartFile data) onUpdate,
+  }) async {
+    File? newImage;
+    await showDialog(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: reusableText(
+            content: title,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            fontColor: Colors.teal,
+          ),
+          content: SizedBox(
+            width: 350,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (imageUrl != null && imageUrl.isNotEmpty)
+                  Container(
+                    height: 180,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.black12,
+                    ),
+                    child: Image.network(
+                      '${Constant.mediaURL + imageUrl}?v=${DateTime.now().millisecondsSinceEpoch}',
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, _, _) =>
+                          const Icon(Icons.broken_image, size: 60),
+                    ),
+                  )
+                else
+                  const Text(
+                    'No image available',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                const SizedBox(height: 16),
+                // reusable picker
+                reusableImagePicker(
+                  imageFile: newImage,
+                  buttonText: 'Upload New Image',
+                  onImagePicked: (file) => setState(() => newImage = file),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+            ElevatedButton(
+              onPressed: newImage == null
+                  ? null
+                  : () async {
+                      final data = await MultipartFile.fromFile(
+                        newImage!.path,
+                        filename: 'image.jpg',
+                      );
+                      await onUpdate(data);
+                      Navigator.pop(context);
+                    },
+              child: const Text('Update Image'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
