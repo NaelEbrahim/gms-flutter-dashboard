@@ -20,7 +20,6 @@ A production-ready full-stack gym management system that automates member lifecy
 - [User Roles](#-user-roles)
 - [API Design](#-api-design)
 - [Repositories](#-repositories)
-- [Screenshots](#-screenshots)
 - [Engineering Achievements](#-engineering-achievements)
 - [Author](#-author)
 
