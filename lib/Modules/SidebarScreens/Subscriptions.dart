@@ -21,6 +21,7 @@ class _SubscriptionsScreenState extends State<Subscriptions>
 
   double discount = 0.0;
   List<SubscriptionModel> userSubscriptions = [];
+  List<ClassModel> userClasses = [];
   List<UserModel> pendingUsers = [];
 
   final discountController = TextEditingController();
@@ -96,16 +97,13 @@ class _SubscriptionsScreenState extends State<Subscriptions>
   }
 
   Widget _historyPaymentTab() {
-    // we use seenTitles Set to prevent duplicates
-    final seenTitles = <String>{};
-    List<DropdownMenuItem<String>> classItems = userSubscriptions
-        .where((s) => seenTitles.add(s.aClass.title))
+    List<DropdownMenuItem<String>> dropdownItems = userClasses
         .map(
-          (s) => DropdownMenuItem<String>(
-            value: s.aClass.title,
+          (e) => DropdownMenuItem<String>(
+            value: e.title,
             child: Components.reusableText(
-              content: s.aClass.title,
-              fontColor: Colors.white70,
+              content: e.title,
+              fontColor: Colors.white,
             ),
           ),
         )
@@ -121,7 +119,7 @@ class _SubscriptionsScreenState extends State<Subscriptions>
                   value: selectedUser?.id,
                   hint: Components.reusableText(
                     content: 'Select user',
-                    fontColor: Colors.white70,
+                    fontColor: Colors.white,
                   ),
                   dropdownColor: Colors.black54,
                   isExpanded: true,
@@ -131,7 +129,7 @@ class _SubscriptionsScreenState extends State<Subscriptions>
                       value: u.id,
                       child: Components.reusableText(
                         content: name,
-                        fontColor: Colors.white70,
+                        fontColor: Colors.white,
                       ),
                     );
                   }).toList(),
@@ -142,6 +140,7 @@ class _SubscriptionsScreenState extends State<Subscriptions>
                     setState(() {
                       selectedUser = user;
                       selectedClass = null;
+                      userClasses.clear();
                       userSubscriptions.clear();
                     });
                   },
@@ -161,12 +160,13 @@ class _SubscriptionsScreenState extends State<Subscriptions>
                     : () async {
                         await manager
                             .getUserSubscriptionsHistory(selectedUser!.id)
-                            .then((_) {
-                              setState(
-                                () => userSubscriptions =
-                                    manager.userSubscriptions,
+                            .then((_) async {
+                              userClasses = await manager.getAllClassesForUser(
+                                selectedUser!.id,
                               );
+                              userSubscriptions = manager.userSubscriptions;
                             });
+                        setState(() {});
                       },
                 child: const Text(
                   'View History',
@@ -187,11 +187,9 @@ class _SubscriptionsScreenState extends State<Subscriptions>
                   ),
                   dropdownColor: Colors.black54,
                   isExpanded: true,
-                  items: classItems,
+                  items: dropdownItems,
                   onChanged: (value) {
-                    final cls = userSubscriptions
-                        .firstWhere((s) => s.aClass.title == value)
-                        .aClass;
+                    final cls = userClasses.firstWhere((s) => s.title == value);
                     setState(() {
                       selectedClass = cls;
                     });

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -148,7 +150,7 @@ class Manager extends Cubit<BlocStates> {
     emit(LoadingState());
     return Dio_Linker.postData(url: CREATEUSER, data: data)
         .then((value) {
-          emit(SuccessState());
+          getUsers('All', 0);
           return value.data['message']['password'] as String;
         })
         .catchError((error) {
@@ -219,11 +221,11 @@ class Manager extends Cubit<BlocStates> {
   );
   bool isBaseLoading = false;
 
-  void getCoaches() {
+  Future<void> getCoaches() async {
     if (isBaseLoading) return;
     isBaseLoading = true;
     emit(LoadingState());
-    Dio_Linker.getData(url: GETUSERS, params: {'role': 'Coach'})
+    return Dio_Linker.getData(url: GETUSERS, params: {'role': 'Coach'})
         .then((value) {
           isBaseLoading = false;
           coaches = GetUsersModel.fromJson(value.data['message']);
@@ -1306,17 +1308,14 @@ class Manager extends Cubit<BlocStates> {
         });
   }
 
-  Future<List<String>> getAllClassesForUser(int userId) async {
+  Future<List<ClassModel>> getAllClassesForUser(int userId) async {
     emit(LoadingState());
     try {
       final value = await Dio_Linker.getData(
         url: GETUSERCLASSES + userId.toString(),
       );
-      final result = (value.data as List)
-          .map((e) => e['name'] as String)
-          .toList();
       emit(SuccessState());
-      return result;
+      return ClassModel.parseList(value.data);
     } catch (error) {
       final errorMessage = handleDioError(error);
       emit(ErrorState(errorMessage));

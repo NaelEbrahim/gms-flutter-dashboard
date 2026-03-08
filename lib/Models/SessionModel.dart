@@ -50,7 +50,6 @@ class SessionModel {
       maxNumber: json['maxNumber'],
       subscribersCount: json['subscribersCount'],
       feedbacks: json['feedbacks'],
-      myFeedBack: json['myFeedBack'],
       joinedAt:
       json['joinedAt'] != null ? DateTime.parse(json['joinedAt']) : null,
       className: json['className'],

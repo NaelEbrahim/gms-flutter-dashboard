@@ -101,7 +101,7 @@ class Components {
   );
 
   static Widget reusableTextButton({
-    required text,
+    required String text,
     required Function() function,
     double height = 20.0,
     double width = 50.0,

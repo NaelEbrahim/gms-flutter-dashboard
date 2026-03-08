@@ -44,11 +44,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
   ];
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Constant.scaffoldColor,

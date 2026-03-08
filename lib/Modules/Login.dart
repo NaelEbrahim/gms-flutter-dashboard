@@ -15,7 +15,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   bool _isPasswordHide = true;
-
+  final inputWidth = 350.0;
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -29,9 +29,6 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    final manager = Manager.get(context);
-    const inputWidth = 350.0;
-
     return BlocConsumer<Manager, BlocStates>(
       listener: (context, state) {
         if (state is ErrorState) {
@@ -126,7 +123,7 @@ class _LoginState extends State<Login> {
                           function: () {
                             if (_formKey.currentState!.validate() &&
                                 state is! LoadingState) {
-                              manager.login({
+                              Manager.get(context).login({
                                 'email': _emailController.text.trim(),
                                 'password': _passwordController.text,
                               });

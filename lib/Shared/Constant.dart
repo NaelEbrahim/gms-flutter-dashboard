@@ -19,7 +19,7 @@ class Constant {
   );
 
   // Backend URL
-  static final String baseAppURL = 'http://localhost:8081/api/';
+  static final String baseAppURL = 'https://gms-be-deployment-ready.onrender.com/api/';
 
   // Validation Regex
   static final String emailRegex =

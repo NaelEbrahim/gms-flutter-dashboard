@@ -18,6 +18,7 @@ class AssignmentDetails extends StatefulWidget {
 
 class _AssignmentDetailsScreenState extends State<AssignmentDetails>
     with TickerProviderStateMixin {
+  late Manager manager;
   int? selectedUserId;
   int? selectedTargetId;
   late TabController _tabController;
@@ -27,7 +28,7 @@ class _AssignmentDetailsScreenState extends State<AssignmentDetails>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    final manager = Manager.get(context);
+    manager = Manager.get(context);
 
     manager.getAllUsers().then((_) {
       switch (widget.type) {
@@ -63,12 +64,12 @@ class _AssignmentDetailsScreenState extends State<AssignmentDetails>
   @override
   void dispose() {
     _tabController.dispose();
+    userAssignments.clear();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final manager = Manager.get(context);
     return BlocConsumer<Manager, BlocStates>(
       listener: (context, state) {
         if (state is ErrorState) {
@@ -111,7 +112,7 @@ class _AssignmentDetailsScreenState extends State<AssignmentDetails>
             fallback: (_) => const Center(child: CircularProgressIndicator()),
             builder: (_) => TabBarView(
               controller: _tabController,
-              children: [_byEntityTab(manager), _byUserTab(manager)],
+              children: [_byEntityTab(), _byUserTab()],
             ),
           ),
         );
@@ -119,7 +120,7 @@ class _AssignmentDetailsScreenState extends State<AssignmentDetails>
     );
   }
 
-  Widget _byEntityTab(Manager manager) {
+  Widget _byEntityTab() {
     final items = _getAssignableItems(manager, widget.type);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -326,7 +327,7 @@ class _AssignmentDetailsScreenState extends State<AssignmentDetails>
     );
   }
 
-  Widget _byUserTab(Manager manager) {
+  Widget _byUserTab() {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -351,8 +352,10 @@ class _AssignmentDetailsScreenState extends State<AssignmentDetails>
                 userAssignments.clear();
                 switch (widget.type) {
                   case 'CLASS':
-                    userAssignments['Classes'] = await manager
-                        .getAllClassesForUser(v);
+                    userAssignments['Classes'] =
+                        (await manager.getAllClassesForUser(
+                          v,
+                        )).map((e) => e.title).toList();
                     break;
                   case 'SESSION':
                     userAssignments['Sessions'] = await manager
